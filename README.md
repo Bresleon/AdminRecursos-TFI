@@ -85,20 +85,5 @@ Cada registro en `productos_visitas` representa un producto específico (con nú
 
 El sistema sigue una arquitectura en **capas**, que facilita la separación de responsabilidades, el mantenimiento y la escalabilidad.
 
-AdminRecursos-TFI/
-│
-├── README.md
-├── docs/
-│ ├── diagramas/
-│ │ ├── casos_uso.png
-│ │ ├── modelo_entidad_relacion.png
-│ │ └── arquitectura.png
-│ └── especificaciones.md
-│
-└── **src/**
-  ├── **Dominio/ -> Entidades y Enums**
-  ├── **Aplicacion/ -> Lógica de negocio, servicios y validaciones**
-  ├── **Infraestructura/ -> Contexto de datos, repositorios y migraciones a base de datos**
-  ├── **Presentacion/ -> Controladores, vistas y endpoints (UI)**
-  └── **Tests/ -> Pruebas unitarias**
+![Arquitectura en capas](./docs/arquitectura_capas.png)
 
