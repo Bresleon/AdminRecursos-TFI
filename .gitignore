@@ -1,0 +1,134 @@
+################################################################################
+# .gitignore para proyecto ASP.NET Core MVC
+# Descripción: Excluye binarios, configuraciones locales, dependencias restaurables
+# y archivos generados automáticamente por Visual Studio o .NET SDK.
+################################################################################
+
+##############################
+# Archivos y carpetas de compilación
+##############################
+bin/
+obj/
+out/
+debug/
+release/
+
+##############################
+# Archivos de configuración local
+##############################
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.vscode/
+.vs/
+.idea/
+
+##############################
+# Archivos de publicación y build
+##############################
+*.publishsettings
+*.pubxml
+*.pubxml.user
+PublishProfiles/
+*.azurePubxml
+project.lock.json
+project.fragment.lock.json
+
+##############################
+# Dependencias restaurables
+##############################
+# (Eliminarlas no afecta, se regeneran con "dotnet restore")
+packages/
+*.nupkg
+*.snupkg
+
+##############################
+# Logs, temporales y diagnósticos
+##############################
+*.log
+*.tlog
+*.cache
+*.tmp
+*.bak
+*.swp
+*.DS_Store
+Thumbs.db
+
+##############################
+# Archivos del sistema operativo
+##############################
+ehthumbs.db
+desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+##############################
+# Configuraciones y secretos
+##############################
+appsettings.Development.json
+appsettings.Local.json
+appsettings.*.json
+secrets.json
+.env
+.env.*
+
+##############################
+# Archivos de Rider, VSCode, ReSharper, etc.
+##############################
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+*.DotSettings
+*.DotCover
+.idea/
+.vscode/
+*.code-workspace
+
+##############################
+# Archivos generados por tests
+##############################
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+.coverage
+*.testsettings
+*.vsmdi
+nunit-*.xml
+
+##############################
+# Archivos estáticos generados automáticamente
+##############################
+wwwroot/lib/
+node_modules/
+bower_components/
+
+##############################
+# Archivos de publicación de IIS
+##############################
+iisexpress/
+*.vspscc
+*.vssscc
+
+##############################
+# Archivos de herramientas de build
+##############################
+*.dbmdl
+*.bak
+*.sql
+*.mdf
+*.ldf
+
+##############################
+# Otros
+##############################
+*.zip
+*.7z
+*.rar
+*.tar.gz
+*.tgz
+*.iso
+*.pdf
+*.docx
+*.xlsx
