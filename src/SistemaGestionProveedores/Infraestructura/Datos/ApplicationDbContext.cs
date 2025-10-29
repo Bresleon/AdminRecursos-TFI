@@ -40,6 +40,8 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Direccion).HasMaxLength(100);
             entity.Property(e => e.Telefono).HasMaxLength(15);
             entity.Property(e => e.Calificacion).HasColumnType("float").HasDefaultValue(0);
+
+            entity.HasData(Iniciales.Instance.Proveedores);
         });
     }
 
@@ -56,6 +58,8 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.Proveedor)
                   .WithMany(p => p.Productos)
                   .HasForeignKey(e => e.ProveedorId);
+
+            entity.HasData(Iniciales.Instance.Productos);
         });
     }
 
@@ -66,6 +70,8 @@ public class ApplicationDbContext : DbContext
             entity.ToTable("tipos_productos");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Nombre).IsRequired().HasMaxLength(100);
+
+            entity.HasData(Iniciales.Instance.TiposProducto);
         });
     }
 
@@ -80,6 +86,8 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.DNI).IsRequired().HasMaxLength(8).IsFixedLength();
             entity.Property(e => e.Telefono).IsRequired().HasMaxLength(15).IsFixedLength();
             entity.Property(e => e.Calificacion).HasColumnType("float").HasDefaultValue(0);
+
+            entity.HasData(Iniciales.Instance.Tecnicos);
         });
     }
 
@@ -97,6 +105,8 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.Tecnico)
                   .WithMany(t => t.Visitas)
                   .HasForeignKey(e => e.TecnicoId);
+
+            entity.HasData(Iniciales.Instance.Visitas);
         });
     }
 
@@ -119,6 +129,8 @@ public class ApplicationDbContext : DbContext
                   .WithMany(p => p.ProductosEnVisita)
                   .HasForeignKey(e => e.ProductoId)
                   .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasData(Iniciales.Instance.ProductosEnVisita);
         });
     }
 }
