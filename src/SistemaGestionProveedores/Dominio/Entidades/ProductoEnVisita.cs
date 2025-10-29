@@ -12,7 +12,7 @@ public class ProductoEnVisita
     public Guid VisitaId { get; set; }
     public Visita Visita { get; set; }
 
-    public string NumeroSerie { get; set; }
+    public string NumeroSerie { get; set; } = string.Empty;
     public decimal PrecioUnitario { get; set; }
     public DateOnly FinGarantia { get; set; }
     public string? Observaciones { get; set; }

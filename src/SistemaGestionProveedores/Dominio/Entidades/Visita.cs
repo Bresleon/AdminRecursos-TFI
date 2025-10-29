@@ -15,4 +15,6 @@ public class Visita
     
     public double Calificacion { get; set; } = 0;
     public EstadoVisita Estado { get; set; } = EstadoVisita.PENDIENTE;
+
+    public ICollection<ProductoEnVisita> ProductosEnVisita { get; set; } = new List<ProductoEnVisita>();
 }
