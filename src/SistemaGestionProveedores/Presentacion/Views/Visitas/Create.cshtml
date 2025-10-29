@@ -1,0 +1,157 @@
+﻿@model VisitaCreateViewModel
+
+@{
+    ViewData["Title"] = "Crear Visita";
+}
+
+<h2>Registrar Nueva Visita</h2>
+
+<form asp-action="Create" method="post" id="visitaForm">
+    <div class="card p-4 shadow-sm mb-4">
+        <h4>Datos de la Visita</h4>
+
+        <div class="mb-3">
+            <label class="form-label">Buscar Técnico por DNI</label>
+            <div class="input-group">
+                <input type="text" id="dniInput" class="form-control" placeholder="Ingrese DNI del técnico..." />
+                <button type="button" id="buscarTecnicoBtn" class="btn btn-outline-primary">Buscar</button>
+            </div>
+            <input type="hidden" id="tecnicoId" name="TecnicoId" />
+        </div>
+
+        <div id="tecnicoInfo" class="alert alert-info d-none mt-2">
+            <strong>Técnico:</strong> <span id="nombreTecnico"></span><br />
+            <strong>Proveedor:</strong> <span id="proveedorTecnico"></span>
+        </div>
+
+        <div class="mb-3 mt-3">
+            <label class="form-label">Observaciones Generales</label>
+            <textarea asp-for="Observaciones" class="form-control" rows="3"></textarea>
+        </div>
+    </div>
+
+    <div class="card p-4 shadow-sm">
+        <h4>Productos de la Visita</h4>
+        <table class="table table-bordered" id="productosTable">
+            <thead class="table-light">
+                <tr>
+                    <th>Producto</th>
+                    <th>N° Serie</th>
+                    <th>Fin Garantía</th>
+                    <th>Precio Unitario</th>
+                    <th>Concepto</th>
+                    <th>Observación</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <button type="button" class="btn btn-outline-primary" id="addProductoBtn" disabled>Agregar Producto</button>
+
+        <div class="mt-4">
+            <label class="form-label fw-bold">Monto Total:</label>
+            <span id="montoTotal" class="fs-5">0.00</span>
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit" class="btn btn-success">Guardar Visita</button>
+        <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        let productosIndex = 0;
+        let productosCatalogo = [];
+        const conceptos = ["VENTA", "REPARACION", "CONTROL"];
+
+        document.getElementById("buscarTecnicoBtn").addEventListener("click", function () {
+            const dni = document.getElementById("dniInput").value.trim();
+            if (!dni) {
+                alert("Ingrese un DNI para buscar.");
+                return;
+            }
+
+            fetch(`/Visitas/ObtenerTecnicoPorDni?dni=${dni}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.success) {
+                        alert(data.message);
+                        document.getElementById("tecnicoInfo").classList.add("d-none");
+                        document.getElementById("addProductoBtn").disabled = true;
+                        return;
+                    }
+
+                    // Mostrar info del técnico
+                    document.getElementById("tecnicoId").value = data.tecnicoId;
+                    document.getElementById("nombreTecnico").innerText = data.tecnicoNombre;
+                    document.getElementById("proveedorTecnico").innerText = data.proveedor;
+                    document.getElementById("tecnicoInfo").classList.remove("d-none");
+
+                    // Cargar productos disponibles
+                    productosCatalogo = data.productos;
+                    document.getElementById("addProductoBtn").disabled = false;
+                })
+                .catch(error => {
+                    console.error("Error al buscar técnico:", error);
+                });
+        });
+
+        document.getElementById("addProductoBtn").addEventListener("click", function () {
+            if (productosCatalogo.length === 0) {
+                alert("Debe buscar un técnico primero.");
+                return;
+            }
+
+            const tbody = document.querySelector("#productosTable tbody");
+            const row = document.createElement("tr");
+
+            row.innerHTML = `
+                <td>
+                    <select name="ProductosVisita[${productosIndex}].ProductoId" class="form-select">
+                        <option value="">Seleccione...</option>
+                        ${productosCatalogo.map(p => `<option value="${p.id}">${p.nombre}</option>`).join("")}
+                    </select>
+                </td>
+                <td><input name="ProductosVisita[${productosIndex}].NumeroSerie" class="form-control" /></td>
+                <td><input type="date" name="ProductosVisita[${productosIndex}].FechaFinGarantia" class="form-control" /></td>
+                <td><input type="number" step="0.01" name="ProductosVisita[${productosIndex}].PrecioUnitario" class="form-control precio" /></td>
+                <td>
+                    <select name="ProductosVisita[${productosIndex}].ConceptoAccion" class="form-select">
+                        ${conceptos.map(c => `<option value="${c}">${c}</option>`).join("")}
+                    </select>
+                </td>
+                <td><input name="ProductosVisita[${productosIndex}].Observacion" class="form-control" /></td>
+                <td><button type="button" class="btn btn-danger btn-sm eliminar">X</button></td>
+            `;
+
+            tbody.appendChild(row);
+            productosIndex++;
+        });
+
+        // Eliminar producto
+        document.querySelector("#productosTable").addEventListener("click", function (e) {
+            if (e.target.classList.contains("eliminar")) {
+                e.target.closest("tr").remove();
+                actualizarMontoTotal();
+            }
+        });
+
+        // Recalcular monto total
+        document.addEventListener("input", function (e) {
+            if (e.target.classList.contains("precio")) {
+                actualizarMontoTotal();
+            }
+        });
+
+        function actualizarMontoTotal() {
+            let total = 0;
+            document.querySelectorAll(".precio").forEach(input => {
+                total += parseFloat(input.value) || 0;
+            });
+            document.getElementById("montoTotal").innerText = total.toFixed(2);
+        }
+    </script>
+}
