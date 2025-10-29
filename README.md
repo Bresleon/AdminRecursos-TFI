@@ -85,5 +85,5 @@ Cada registro en `productos_visitas` representa un producto específico (con nú
 
 El sistema sigue una arquitectura en **capas**, que facilita la separación de responsabilidades, el mantenimiento y la escalabilidad.
 
-![Arquitectura en capas](./docs/arquitectura_capas.png)
+![Arquitectura en capas](./docs/https://raw.githubusercontent.com/Bresleon/AdminRecursos-TFI/main/docs/arquitectura_capas.png)
 
