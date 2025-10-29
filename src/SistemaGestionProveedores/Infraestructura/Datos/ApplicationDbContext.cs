@@ -39,7 +39,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Email).HasMaxLength(100);
             entity.Property(e => e.Direccion).HasMaxLength(100);
             entity.Property(e => e.Telefono).HasMaxLength(15);
-            entity.Property(e => e.Calificacion).HasColumnType("double").HasDefaultValue(0);
+            entity.Property(e => e.Calificacion).HasColumnType("float").HasDefaultValue(0);
         });
     }
 
@@ -79,7 +79,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Apellido).IsRequired().HasMaxLength(50);
             entity.Property(e => e.DNI).IsRequired().HasMaxLength(8).IsFixedLength();
             entity.Property(e => e.Telefono).IsRequired().HasMaxLength(15).IsFixedLength();
-            entity.Property(e => e.Calificacion).HasColumnType("double").HasDefaultValue(0);
+            entity.Property(e => e.Calificacion).HasColumnType("float").HasDefaultValue(0);
         });
     }
 
@@ -91,7 +91,7 @@ public class ApplicationDbContext : DbContext
             entity.HasKey(e => e.Id);
             entity.Property(e => e.FechaHora).IsRequired();
             entity.Property(e => e.MontoTotal).IsRequired().HasColumnType("decimal(18,2)");
-            entity.Property(e => e.Calificacion).HasColumnType("double").HasDefaultValue(0);
+            entity.Property(e => e.Calificacion).HasColumnType("float").HasDefaultValue(0);
             entity.Property(e => e.Estado).HasConversion<string>().IsRequired();
             entity.Property(e => e.Observaciones).HasMaxLength(1000);
             entity.HasOne(e => e.Tecnico)
@@ -113,10 +113,12 @@ public class ApplicationDbContext : DbContext
             entity.Property(e => e.Observaciones).HasMaxLength(1000);
             entity.HasOne(e => e.Visita)
                   .WithMany(v => v.ProductosEnVisita)
-                  .HasForeignKey(e => e.VisitaId);
+                  .HasForeignKey(e => e.VisitaId)
+                  .OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(e => e.Producto)
                   .WithMany(p => p.ProductosEnVisita)
-                  .HasForeignKey(e => e.ProductoId);
+                  .HasForeignKey(e => e.ProductoId)
+                  .OnDelete(DeleteBehavior.Cascade);
         });
     }
 }
