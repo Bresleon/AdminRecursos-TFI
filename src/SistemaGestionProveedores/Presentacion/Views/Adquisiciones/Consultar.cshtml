@@ -1,4 +1,4 @@
-﻿@model ProductoConsultaViewModel?
+﻿@model AdquisicionViewModel?
 
 @{
     ViewData["Title"] = "Consultar Adquisición";
@@ -23,12 +23,16 @@
             <td>@Model.NumeroSerie</td>
         </tr>
         <tr>
-            <th>Producto</th>
+            <th>Equipo</th>
             <td>@Model.Nombre</td>
         </tr>
         <tr>
-            <th>Tipo de Producto</th>
-            <td>@Model.TipoProducto</td>
+            <th>Tipo de Equipo</th>
+            <td>@Model.TipoEquipo</td>
+        </tr>
+        <tr>
+            <th>Costo</th>
+            <td>@Model.Costo.ToString("c")</td>
         </tr>
         <tr>
             <th>Fecha de Adquisición</th>

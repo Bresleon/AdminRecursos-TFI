@@ -18,4 +18,9 @@
     <ProjectReference Include="..\Infraestructura\Infraestructura.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Views\Productos\" />
+    <Folder Include="Views\Visitas\" />
+  </ItemGroup>
+
 </Project>
