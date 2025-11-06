@@ -10,22 +10,24 @@ public class ApplicationDbContext : DbContext
     }
 
     public DbSet<Proveedor> Proveedores { get; set; }
-    public DbSet<Producto> Productos { get; set; }
-    public DbSet<TipoProducto> TiposProducto { get; set; }
+    public DbSet<Equipo> Equipos { get; set; }
+    public DbSet<TipoEquipo> TiposEquipo { get; set; }
     public DbSet<Tecnico> Tecnicos { get; set; }
-    public DbSet<Visita> Visitas { get; set; }
-    public DbSet<ProductoEnVisita> ProductosEnVisita { get; set; }
+    public DbSet<Adquisicion> Adquisiciones { get; set; }
+    public DbSet<TipoMantenimiento> TiposMantenimiento { get; set; }
+    public DbSet<Mantenimiento> Mantenimientos { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
 
         ProveedoresConfig(modelBuilder);
-        ProductosConfig(modelBuilder);
-        TiposProductoConfig(modelBuilder);
+        EquiposConfig(modelBuilder);
+        TiposEquipoConfig(modelBuilder);
         TecnicosConfig(modelBuilder);
-        VisitasConfig(modelBuilder);
-        ProductosEnVisitaConfig(modelBuilder);
+        AdquisicionesConfig(modelBuilder);
+        TiposMantenimientoConfig(modelBuilder);
+        MantenimientosConfig(modelBuilder);
     }
 
     private void ProveedoresConfig(ModelBuilder modelBuilder)
@@ -33,45 +35,45 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Proveedor>(entity =>
         {
             entity.ToTable("proveedores");
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.RazonSocial).IsRequired().HasMaxLength(100);
-            entity.Property(e => e.CUIT).IsRequired().HasMaxLength(20).IsFixedLength();
-            entity.Property(e => e.Email).HasMaxLength(100);
-            entity.Property(e => e.Direccion).HasMaxLength(100);
-            entity.Property(e => e.Telefono).HasMaxLength(15);
-            entity.Property(e => e.Calificacion).HasColumnType("float").HasDefaultValue(0);
+            entity.HasKey(p => p.Id);
+            entity.Property(p => p.RazonSocial).IsRequired().HasMaxLength(100);
+            entity.Property(p => p.CUIT).IsRequired().HasMaxLength(20).IsFixedLength();
+            entity.Property(p => p.Email).HasMaxLength(100);
+            entity.Property(p => p.Direccion).HasMaxLength(100);
+            entity.Property(p => p.Telefono).HasMaxLength(15);
+            entity.Property(p => p.Calificacion).HasColumnType("float").HasDefaultValue(0);
 
             entity.HasData(Iniciales.Instance.Proveedores);
         });
     }
 
-    private void ProductosConfig(ModelBuilder modelBuilder)
+    private void EquiposConfig(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Producto>(entity =>
+        modelBuilder.Entity<Equipo>(entity =>
         {
-            entity.ToTable("productos");
+            entity.ToTable("equipos");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Nombre).IsRequired().HasMaxLength(100);
-            entity.HasOne(e => e.TipoProducto)
-                  .WithMany(tp => tp.Productos)
-                  .HasForeignKey(e => e.TipoProductoId);
+            entity.HasOne(e => e.TipoEquipo)
+                  .WithMany(te => te.Equipos)
+                  .HasForeignKey(e => e.TipoEquipoId);
             entity.HasOne(e => e.Proveedor)
-                  .WithMany(p => p.Productos)
+                  .WithMany(p => p.Equipos)
                   .HasForeignKey(e => e.ProveedorId);
 
-            entity.HasData(Iniciales.Instance.Productos);
+            entity.HasData(Iniciales.Instance.Equipos);
         });
     }
 
-    private void TiposProductoConfig(ModelBuilder modelBuilder)
+    private void TiposEquipoConfig(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<TipoProducto>(entity =>
+        modelBuilder.Entity<TipoEquipo>(entity =>
         {
-            entity.ToTable("tipos_productos");
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Nombre).IsRequired().HasMaxLength(100);
+            entity.ToTable("tipos_equipos");
+            entity.HasKey(te => te.Id);
+            entity.Property(te => te.Nombre).IsRequired().HasMaxLength(100);
 
-            entity.HasData(Iniciales.Instance.TiposProducto);
+            entity.HasData(Iniciales.Instance.TiposEquipo);
         });
     }
 
@@ -80,57 +82,77 @@ public class ApplicationDbContext : DbContext
         modelBuilder.Entity<Tecnico>(entity =>
         {
             entity.ToTable("tecnicos");
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.Nombre).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.Apellido).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.DNI).IsRequired().HasMaxLength(8).IsFixedLength();
-            entity.Property(e => e.Telefono).IsRequired().HasMaxLength(15).IsFixedLength();
-            entity.Property(e => e.Calificacion).HasColumnType("float").HasDefaultValue(0);
+            entity.HasKey(t => t.Id);
+            entity.Property(t => t.Nombre).IsRequired().HasMaxLength(50);
+            entity.Property(t => t.Apellido).IsRequired().HasMaxLength(50);
+            entity.Property(t => t.DNI).IsRequired().HasMaxLength(8).IsFixedLength();
+            entity.Property(t => t.Telefono).IsRequired().HasMaxLength(15).IsFixedLength();
+            entity.Property(t => t.Calificacion).HasColumnType("float").HasDefaultValue(0);
 
             entity.HasData(Iniciales.Instance.Tecnicos);
         });
     }
 
-    private void VisitasConfig(ModelBuilder modelBuilder)
+    private void AdquisicionesConfig(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Visita>(entity =>
+        modelBuilder.Entity<Adquisicion>(entity =>
         {
-            entity.ToTable("visitas");
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.FechaHora).IsRequired();
-            entity.Property(e => e.MontoTotal).IsRequired().HasColumnType("decimal(18,2)");
-            entity.Property(e => e.Calificacion).HasColumnType("float").HasDefaultValue(0);
-            entity.Property(e => e.Estado).HasConversion<string>().IsRequired();
-            entity.Property(e => e.Observaciones).HasMaxLength(1000);
+            entity.ToTable("adquisiciones");
+            entity.HasKey(a => a.Id);
+            entity.Property(a => a.NumeroSerie).IsRequired().HasMaxLength(50);
+            entity.Property(a => a.FechaAdquisicion).IsRequired();
+            entity.Property(a => a.FechaFinGarantia).IsRequired();
+            entity.Property(a => a.Costo).IsRequired().HasColumnType("decimal(18,2)");
+            entity.HasOne(a => a.Equipo)
+                  .WithMany(e => e.Adquisiciones)
+                  .HasForeignKey(a => a.EquipoId)
+                  .OnDelete(DeleteBehavior.Restrict);
             entity.HasOne(e => e.Tecnico)
-                  .WithMany(t => t.Visitas)
-                  .HasForeignKey(e => e.TecnicoId);
+                  .WithMany(t => t.Adquisiciones)
+                  .HasForeignKey(e => e.TecnicoId)
+                  .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasData(Iniciales.Instance.Visitas);
+            entity.HasData(Iniciales.Instance.Adquisiciones);
         });
     }
 
-    private void ProductosEnVisitaConfig(ModelBuilder modelBuilder)
+    private void TiposMantenimientoConfig(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<ProductoEnVisita>(entity =>
+        modelBuilder.Entity<TipoMantenimiento>(entity =>
         {
-            entity.ToTable("productos_visitas");
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.NumeroSerie).IsRequired().HasMaxLength(50);
-            entity.Property(e => e.PrecioUnitario).IsRequired().HasColumnType("decimal(18,2)");
-            entity.Property(e => e.FinGarantia).IsRequired();
-            entity.Property(e => e.Concepto).HasConversion<string>().IsRequired();
-            entity.Property(e => e.Observaciones).HasMaxLength(1000);
-            entity.HasOne(e => e.Visita)
-                  .WithMany(v => v.ProductosEnVisita)
-                  .HasForeignKey(e => e.VisitaId)
-                  .OnDelete(DeleteBehavior.Restrict);
-            entity.HasOne(e => e.Producto)
-                  .WithMany(p => p.ProductosEnVisita)
-                  .HasForeignKey(e => e.ProductoId)
-                  .OnDelete(DeleteBehavior.Cascade);
+            entity.ToTable("tipos_mantenimiento");
+            entity.HasKey(tm => tm.Id);
+            entity.Property(tm => tm.Descripcion).IsRequired().HasMaxLength(100);
 
-            entity.HasData(Iniciales.Instance.ProductosEnVisita);
+            entity.HasData(Iniciales.Instance.TiposMantenimiento);
+        });
+    }
+
+    private void MantenimientosConfig(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Mantenimiento>(entity =>
+        {
+            entity.ToTable("mantenimientos");
+            entity.HasKey(m => m.Id);
+            entity.Property(m => m.Estado).HasConversion<string>().IsRequired();
+            entity.Property(m => m.Fecha).IsRequired();
+            entity.Property(m => m.Descripcion).IsRequired().HasMaxLength(250);
+            entity.Property(m => m.Costo).IsRequired().HasColumnType("decimal(18,2)");
+            entity.Property(m => m.Calificacion).HasColumnType("float").HasDefaultValue(0);
+            entity.HasOne(m => m.Adquisicion)
+                  .WithMany(a => a.Mantenimientos)
+                  .HasForeignKey(m => m.AdquisicionId)
+                  .OnDelete(DeleteBehavior.Cascade);
+            entity.HasOne(m => m.Tecnico)
+                  .WithMany(t => t.Mantenimientos)
+                  .HasForeignKey(m => m.TecnicoId)
+                  .OnDelete(DeleteBehavior.Restrict);
+            entity.HasOne(m => m.TipoMantenimiento)
+                  .WithMany(tm => tm.Mantenimientos)
+                  .HasForeignKey(m => m.TipoMantenimientoId)
+                  .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasData(Iniciales.Instance.Mantenimientos);
         });
     }
 }

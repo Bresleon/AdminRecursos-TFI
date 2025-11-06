@@ -1,7 +1,7 @@
 ﻿namespace Dominio.Enums;
 
-public enum EstadoVisita
+public enum Estado
 {
     PENDIENTE,
-    COMPLETADA
+    FINALIZADO
 }

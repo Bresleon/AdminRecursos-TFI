@@ -31,20 +31,22 @@ public class Iniciales
     }
 
     public List<Proveedor> Proveedores { get; private set; } = new();
-    public List<Producto> Productos { get; private set; } = new();
-    public List<TipoProducto> TiposProducto { get; private set; } = new();
+    public List<Equipo> Equipos { get; private set; } = new();
+    public List<TipoEquipo> TiposEquipo { get; private set; } = new();
     public List<Tecnico> Tecnicos { get; private set; } = new();
-    public List<Visita> Visitas { get; private set; } = new();
-    public List<ProductoEnVisita> ProductosEnVisita { get; private set; } = new();
+    public List<Adquisicion> Adquisiciones { get; private set; } = new();
+    public List<TipoMantenimiento> TiposMantenimiento { get; private set; } = new();
+    public List<Mantenimiento> Mantenimientos { get; private set; } = new();
 
     private void Inicializar()
     {
         InicializarProveedores();
-        InicializarTiposProducto();
-        InicializarProductos();
+        InicializarTiposEquipo();
+        InicializarEquipos();
         InicializarTecnicos();
-        InicializarVisitas();
-        InicializarProductosEnVisita();
+        InicializarAdquisiciones();
+        InicializarTiposMantenimiento();
+        InicializarMantenimientos();
     }
 
     private void InicializarProveedores()
@@ -59,7 +61,7 @@ public class Iniciales
                 Email = "contacto@techworld.com",
                 Direccion = "Av. Corrientes 2400, CABA",
                 Telefono = "011-4785-5566",
-                Calificacion = 0
+                Calificacion = 4.25f
             },
             new Proveedor
             {
@@ -74,26 +76,26 @@ public class Iniciales
         ]);
     }
 
-    private void InicializarTiposProducto()
+    private void InicializarTiposEquipo()
     {
-        TiposProducto.AddRange(
+        TiposEquipo.AddRange(
         [
-            new TipoProducto
+            new TipoEquipo
             {
                 Id = Guid.Parse("33333333-3333-3333-3333-333333333333"),
                 Nombre = "Hardware"
             },
-            new TipoProducto
+            new TipoEquipo
             {
                 Id = Guid.Parse("44444444-4444-4444-4444-444444444444"),
                 Nombre = "Periféricos"
             },
-            new TipoProducto
+            new TipoEquipo
             {
                 Id = Guid.Parse("55555555-5555-5555-5555-555555555555"),
                 Nombre = "Software"
             },
-            new TipoProducto
+            new TipoEquipo
             {
                 Id = Guid.Parse("66666666-6666-6666-6666-666666666666"),
                 Nombre = "Redes"
@@ -101,37 +103,37 @@ public class Iniciales
         ]);
     }
 
-    private void InicializarProductos()
+    private void InicializarEquipos()
     {
-        Productos.AddRange(
+        Equipos.AddRange(
         [
-            new Producto
+            new Equipo
             {
                 Id = Guid.Parse("77777777-7777-7777-7777-777777777777"),
                 Nombre = "Notebook Lenovo ThinkPad E14",
                 ProveedorId = Proveedores.ElementAt(0).Id,
-                TipoProductoId = TiposProducto.ElementAt(0).Id
+                TipoEquipoId = TiposEquipo.ElementAt(0).Id
             },
-            new Producto
+            new Equipo
             {
                 Id = Guid.Parse("88888888-8888-8888-8888-888888888888"),
                 Nombre = "Mouse Logitech M720",
                 ProveedorId = Proveedores.ElementAt(0).Id,
-                TipoProductoId = TiposProducto.ElementAt(1).Id
+                TipoEquipoId = TiposEquipo.ElementAt(1).Id
             },
-            new Producto
+            new Equipo
             {
                 Id = Guid.Parse("99999999-9999-9999-9999-999999999999"),
                 Nombre = "Router TP-Link Archer AX73",
                 ProveedorId = Proveedores.ElementAt(1).Id,
-                TipoProductoId = TiposProducto.ElementAt(3).Id
+                TipoEquipoId = TiposEquipo.ElementAt(3).Id
             },
-            new Producto
+            new Equipo
             {
                 Id = Guid.Parse("10101010-1010-1010-1010-101010101010"),
                 Nombre = "Licencia Microsoft Office 365",
                 ProveedorId = Proveedores.ElementAt(1).Id,
-                TipoProductoId = TiposProducto.ElementAt(2).Id
+                TipoEquipoId = TiposEquipo.ElementAt(2).Id
             },
         ]);
     }
@@ -147,16 +149,18 @@ public class Iniciales
                 Nombre = "Javier",
                 Apellido = "Giménez",
                 DNI = "33244567",
-                Telefono = "+543814445566"
+                Telefono = "+543814445566",
+                Calificacion = 4.5f
             },
             new Tecnico
             {
                 Id = Guid.Parse("752b6aa3-4448-47eb-9edf-64c7b2fdcd02"),
-                ProveedorId = Proveedores.ElementAt(1).Id,
+                ProveedorId = Proveedores.ElementAt(0).Id,
                 Nombre = "Lucía",
                 Apellido = "Ríos",
                 DNI = "37456789",
-                Telefono = "+543814567891"
+                Telefono = "+543814567891",
+                Calificacion = 4.0f
             },
             new Tecnico
             {
@@ -170,83 +174,107 @@ public class Iniciales
         ]);
     }
 
-    private void InicializarVisitas()
+    private void InicializarAdquisiciones()
     {
-        Visitas.AddRange(
+        Adquisiciones.AddRange(
         [
-            new Visita
+            new Adquisicion
             {
-                Id = Guid.Parse("7c835130-a8e0-46cc-8aeb-8198a76d7222"),
+                Id = Guid.Parse("67a48d6c-e3d1-4aa5-bcf8-75f6404a8c8a"),
+                EquipoId = Equipos.ElementAt(0).Id,
                 TecnicoId = Tecnicos.ElementAt(0).Id,
-                MontoTotal = 165000,
-                FechaHora = new DateTime(2025,10,15,14,30,0),
-                Observaciones = "Adquisición de Notebook Lenovo y Mouse Logitech",
-                Calificacion = 5
+                NumeroSerie = "SN-LEN-12345",
+                Costo = 130000,
+                FechaFinGarantia = new DateOnly(2027,10,15),
+                FechaAdquisicion = new DateOnly(2025,10,15),
             },
-            new Visita
+            new Adquisicion
             {
-                Id = Guid.Parse("7c89a11d-8d06-4608-90f9-4bd1d6d2487e"),
-                TecnicoId = Tecnicos.ElementAt(1).Id,
-                MontoTotal = 70000,
-                FechaHora = new DateTime(2025,10,20,17,15,0),
-                Observaciones = "Adquisición de Router Tp-Link",
-                Calificacion = 4
+                Id = Guid.Parse("cfc3972f-981a-4c8e-94a3-cce84d90785e"),
+                EquipoId = Equipos.ElementAt(1).Id,
+                TecnicoId = Tecnicos.ElementAt(0).Id,
+                NumeroSerie = "SN-LOG-45678",
+                Costo = 35000,
+                FechaFinGarantia = new DateOnly(2026,10,15),
+                FechaAdquisicion = new DateOnly(2025,10,15),
             },
-            new Visita
+            new Adquisicion
             {
-                Id = Guid.Parse("81a840f4-d3cf-49a1-959f-dcc3e5fbe9cf"),
-                TecnicoId = Tecnicos.ElementAt(2).Id,
-                MontoTotal = 180000,
-                FechaHora = new DateTime(2025,10,23,11,47,0),
-                Observaciones = "Adquisición de Paquete Microsoft Office",
-                Calificacion = 5
+                Id = Guid.Parse("d9b12292-133a-48e5-97e1-fcf2eb39b38d"),
+                EquipoId = Equipos.ElementAt(2).Id,
+                TecnicoId = Tecnicos.ElementAt(0).Id,
+                NumeroSerie = "SN-TPL-98765",
+                Costo = 70000,
+                FechaFinGarantia = new DateOnly(2028,10,20),
+                FechaAdquisicion = new DateOnly(2025,10,20),
+            },
+            new Adquisicion
+            {
+                Id = Guid.Parse("e0c65170-653d-4162-83bc-81bce59be1b4"),
+                EquipoId = Equipos.ElementAt(3).Id,
+                TecnicoId = Tecnicos.ElementAt(0).Id,
+                NumeroSerie = "SN-MS-11223",
+                Costo = 180000,
+                FechaFinGarantia = new DateOnly(2026,10,23),
+                FechaAdquisicion = new DateOnly(2025,10,23),
             }
         ]);
     }
 
-    private void InicializarProductosEnVisita()
+    public void InicializarTiposMantenimiento()
     {
-        ProductosEnVisita.AddRange(
+        TiposMantenimiento.AddRange(
         [
-            new ProductoEnVisita
+            new TipoMantenimiento
             {
-                Id = Guid.Parse("67a48d6c-e3d1-4aa5-bcf8-75f6404a8c8a"),
-                ProductoId = Productos.ElementAt(0).Id,
-                VisitaId = Visitas.ElementAt(0).Id,
-                NumeroSerie = "SN-LEN-12345",
-                PrecioUnitario = 130000,
-                FinGarantia = new DateOnly(2027,10,15),
-                Concepto = ConceptoAccion.VENTA
+                Id = Guid.Parse("7F900D5C-45B5-424E-9A4C-7663C9ACCE1E"),
+                Descripcion = "Instalación"
             },
-            new ProductoEnVisita
+            new TipoMantenimiento
             {
-                Id = Guid.Parse("cfc3972f-981a-4c8e-94a3-cce84d90785e"),
-                ProductoId = Productos.ElementAt(1).Id,
-                VisitaId = Visitas.ElementAt(0).Id,
-                NumeroSerie = "SN-LOG-45678",
-                PrecioUnitario = 35000,
-                FinGarantia = new DateOnly(2026,10,15),
-                Concepto = ConceptoAccion.VENTA
+                Id = Guid.Parse("1B74F1E6-18A3-40A7-BD25-279F97329661"),
+                Descripcion = "Reparación en garantía"
             },
-            new ProductoEnVisita
+            new TipoMantenimiento
             {
-                Id = Guid.Parse("d9b12292-133a-48e5-97e1-fcf2eb39b38d"),
-                ProductoId = Productos.ElementAt(2).Id,
-                VisitaId = Visitas.ElementAt(1).Id,
-                NumeroSerie = "SN-TPL-98765",
-                PrecioUnitario = 70000,
-                FinGarantia = new DateOnly(2028,10,20),
-                Concepto = ConceptoAccion.VENTA
+                Id = Guid.Parse("97E99A3B-E5A1-4AC4-9D60-EAC409C3D681"),
+                Descripcion = "Reparación fuera de garantía"
             },
-            new ProductoEnVisita
+            new TipoMantenimiento
             {
-                Id = Guid.Parse("e0c65170-653d-4162-83bc-81bce59be1b4"),
-                ProductoId = Productos.ElementAt(3).Id,
-                VisitaId = Visitas.ElementAt(2).Id,
-                NumeroSerie = "SN-MS-11223",
-                PrecioUnitario = 180000,
-                FinGarantia = new DateOnly(2026,10,23),
-                Concepto = ConceptoAccion.VENTA
+                Id = Guid.Parse("9DE506E3-E483-4CE1-B44E-9D66AC847F8C"),
+                Descripcion = "Actualización"
+            }
+        ]);
+    }
+
+    public void InicializarMantenimientos()
+    {
+        Mantenimientos.AddRange(
+        [
+            new Mantenimiento
+            {
+                Id = Guid.Parse("CF58E1E4-CFC9-4DC4-8066-C82C0C62181D"),
+                AdquisicionId = Adquisiciones.ElementAt(0).Id,
+                TecnicoId = Tecnicos.ElementAt(0).Id,
+                TipoMantenimientoId = TiposMantenimiento.ElementAt(0).Id,
+                Estado = Estado.FINALIZADO,
+                Fecha = new DateOnly(2025,11,1),
+                Costo = 0,
+                Descripcion = "Instalación inicial del sistema operativo y software básico.",
+                Calificacion = 4.5f
+            },
+            new Mantenimiento
+            {
+                Id = Guid.Parse("9F0E8550-0C39-4CF2-8255-852C72FE9AAB"),
+                AdquisicionId = Adquisiciones.ElementAt(2).Id,
+                TecnicoId = Tecnicos.ElementAt(1).Id,
+                TipoMantenimientoId = TiposMantenimiento.ElementAt(3).Id,
+                Estado = Estado.FINALIZADO,
+                Fecha = new DateOnly(2026,11,27),
+                Costo = 15000,
+                Descripcion = "Actualización del firmware del router para mejorar la seguridad.",
+                Calificacion = 4.0f
             }
         ]);
     }
