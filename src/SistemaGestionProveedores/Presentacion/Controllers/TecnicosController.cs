@@ -1,6 +1,8 @@
 ﻿using Infraestructura.Datos;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Presentacion.Models;
 
 namespace Presentacion.Controllers;
 
@@ -26,14 +28,109 @@ public class TecnicosController : Controller
         var tecnicosVM = tecnicos.Select(t => new Models.TecnicoViewModel
         {
             Id = t.Id,
-            NombreCompleto = t.Nombre + " " + t.Apellido,
+            Nombre = t.Nombre,
+            Apellido = t.Apellido,
             DNI = t.DNI,
             Telefono = t.Telefono,
-            Proveedor = t.Proveedor.RazonSocial,
+            ProveedorNombre = t.Proveedor.RazonSocial,
             Calificacion = t.Calificacion
         });
 
         return View(tecnicosVM);
+    }
+
+    public IActionResult Crear()
+    {
+        var proveedores = _context.Proveedores
+            .Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.RazonSocial
+            })
+            .ToList();
+
+        var tecnicoVM = new TecnicoViewModel
+        {
+            ProveedoresDisponibles = proveedores
+        };
+
+        return View(tecnicoVM);
+    }
+
+    public IActionResult Detalles(Guid id)
+    {
+        var tecnico = _context.Tecnicos
+            .Include(t => t.Proveedor)
+            .FirstOrDefault(t => t.Id == id);
+
+        if (tecnico == null)
+            return NotFound();
+
+        var tecnicoVM = new TecnicoViewModel
+        {
+            Id = tecnico.Id,
+            Nombre = tecnico.Nombre,
+            Apellido = tecnico.Apellido,
+            DNI = tecnico.DNI,
+            Telefono = tecnico.Telefono,
+            ProveedorNombre = tecnico.Proveedor.RazonSocial,
+            Calificacion = tecnico.Calificacion
+        };
+
+        return View(tecnicoVM);
+    }
+
+    public IActionResult Editar(Guid id)
+    {
+        var tecnico = _context.Tecnicos
+            .Include(t => t.Proveedor)
+            .FirstOrDefault(t => t.Id == id);
+
+        if (tecnico == null)
+            return NotFound();
+
+        var proveedores = _context.Proveedores
+            .Select(p => new SelectListItem
+            {
+                Value = p.Id.ToString(),
+                Text = p.RazonSocial
+            })
+            .ToList();
+
+        var tecnicoVM = new TecnicoViewModel
+        {
+            Id = tecnico.Id,
+            Nombre = tecnico.Nombre,
+            Apellido = tecnico.Apellido,
+            DNI = tecnico.DNI,
+            Telefono = tecnico.Telefono,
+            ProveedorId = tecnico.Proveedor.Id,
+            ProveedoresDisponibles = proveedores
+        };
+
+        return View(tecnicoVM);
+    }
+
+    public IActionResult Eliminar(Guid id)
+    {
+        var tecnico = _context.Tecnicos
+            .Include(t => t.Proveedor)
+            .FirstOrDefault(t => t.Id == id);
+
+        if (tecnico == null)
+            return NotFound();
+
+        var tecnicoVM = new TecnicoViewModel
+        {
+            Id = tecnico.Id,
+            Nombre = tecnico.Nombre,
+            Apellido = tecnico.Apellido,
+            DNI = tecnico.DNI,
+            Telefono = tecnico.Telefono,
+            ProveedorNombre = tecnico.Proveedor.RazonSocial
+        };
+
+        return View(tecnicoVM);
     }
 
     #region AJAX_CALLS

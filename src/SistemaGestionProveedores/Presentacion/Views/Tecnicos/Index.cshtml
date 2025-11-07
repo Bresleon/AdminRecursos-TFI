@@ -7,7 +7,7 @@
 <h1 class="mb-4">Tus Técnicos</h1>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-	<a asp-action="Create" class="btn btn-primary">
+	<a asp-action="Crear" class="btn btn-primary">
 		<i class="bi bi-plus-circle"></i> Nuevo Técnico
 	</a>
 
@@ -27,28 +27,27 @@
 				<th>Teléfono</th>
 				<th>Proveedor en donde trabaja</th>
 				<th>Calificación</th>
-				<th>Acciones</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
 			@foreach (var tecnico in Model)
 			{
 				<tr>
-					<td>@tecnico.NombreCompleto</td>
+					<td>@tecnico.Nombre @tecnico.Apellido</td>
 					<td>@tecnico.DNI</td>
 					<td>@tecnico.Telefono</td>
-					<td>@tecnico.Proveedor</td>
+					<td>@tecnico.ProveedorNombre</td>
 					<td>@tecnico.Calificacion</td>
 					<td>
 						<div class="btn-group" role="group">
-							<a asp-action="Edit" asp-route-id="@tecnico.Id" class="btn btn-sm btn-warning">
+							<a asp-action="Editar" asp-route-id="@tecnico.Id" class="btn btn-sm btn-warning">
 								<i class="bi bi-pencil"></i> Editar
 							</a>
-							<a asp-action="Details" asp-route-id="@tecnico.Id" class="btn btn-sm btn-info">
+							<a asp-action="Detalles" asp-route-id="@tecnico.Id" class="btn btn-sm btn-info">
 								<i class="bi bi-eye"></i> Detalles
 							</a>
-							<a asp-action="Delete" asp-route-id="@tecnico.Id" class="btn btn-sm btn-danger"
-							   onclick="return confirm('¿Está seguro de eliminar este técnico?');">
+							<a asp-action="Eliminar" asp-route-id="@tecnico.Id" class="btn btn-sm btn-danger">
 								<i class="bi bi-trash"></i> Eliminar
 							</a>
 						</div>

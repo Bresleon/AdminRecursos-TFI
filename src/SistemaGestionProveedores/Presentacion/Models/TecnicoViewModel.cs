@@ -1,11 +1,19 @@
-﻿namespace Presentacion.Models;
+﻿using Microsoft.AspNetCore.Mvc.Rendering;
+
+namespace Presentacion.Models;
 
 public class TecnicoViewModel
 {
     public Guid Id { get; set; }
-    public string NombreCompleto { get; set; } = string.Empty;
+
+    public Guid ProveedorId { get; set; }
+    public string? ProveedorNombre { get; set; } = string.Empty;
+
+    public string Nombre { get; set; } = string.Empty;
+    public string Apellido { get; set; } = string.Empty;
     public string DNI { get; set; } = string.Empty;
     public string Telefono { get; set; } = string.Empty;
-    public string Proveedor { get; set; } = string.Empty;
-    public double Calificacion { get; set; } = 0;
+    public float Calificacion { get; set; } = 0;
+
+    public List<SelectListItem> ProveedoresDisponibles { get; set; } = new();
 }
