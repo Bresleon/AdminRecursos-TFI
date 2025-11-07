@@ -2,7 +2,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Presentacion.Models;
+using Presentacion.Models.Tecnicos;
 
 namespace Presentacion.Controllers;
 
@@ -25,7 +25,7 @@ public class TecnicosController : Controller
             tecnicos = tecnicos.Where(t => t.DNI == dni);
         }
 
-        var tecnicosVM = tecnicos.Select(t => new Models.TecnicoViewModel
+        var tecnicosVM = tecnicos.Select(t => new TecnicoViewModel
         {
             Id = t.Id,
             Nombre = t.Nombre,

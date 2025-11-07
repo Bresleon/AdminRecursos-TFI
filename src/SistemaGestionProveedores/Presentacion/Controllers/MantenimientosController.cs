@@ -1,10 +1,9 @@
-﻿using Dominio.Entidades;
-using Dominio.Enums;
+﻿using Dominio.Enums;
 using Infraestructura.Datos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Presentacion.Models;
+using Presentacion.Models.Mantenimientos;
 
 namespace Presentacion.Controllers;
 
@@ -27,7 +26,7 @@ public class MantenimientosController : Controller
             .Include(m => m.Tecnico)
             .ToList();
 
-        var mantenimientosVM = mantenimientos.Select(m => new Models.MantenimientoViewModel
+        var mantenimientosVM = mantenimientos.Select(m => new MantenimientoViewModel
         {
             Id = m.Id,
             NumeroSerie = m.Adquisicion.NumeroSerie,

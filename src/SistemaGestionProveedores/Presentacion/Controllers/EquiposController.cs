@@ -1,10 +1,8 @@
-﻿using Dominio.Entidades;
-using Infraestructura.Datos;
+﻿using Infraestructura.Datos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Presentacion.Models;
-using System.Threading.Tasks;
+using Presentacion.Models.Equipos;
 
 namespace Presentacion.Controllers;
 

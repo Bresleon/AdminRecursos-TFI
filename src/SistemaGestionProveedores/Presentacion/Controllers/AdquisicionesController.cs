@@ -3,7 +3,7 @@ using Infraestructura.Datos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using Presentacion.Models;
+using Presentacion.Models.Adquisiciones;
 
 namespace Presentacion.Controllers;
 

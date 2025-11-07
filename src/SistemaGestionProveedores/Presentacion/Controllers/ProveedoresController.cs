@@ -1,7 +1,7 @@
 ﻿using Infraestructura.Datos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Presentacion.Models;
+using Presentacion.Models.Proveedores;
 
 namespace Presentacion.Controllers;
 

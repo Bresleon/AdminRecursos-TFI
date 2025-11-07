@@ -1,4 +1,4 @@
-﻿namespace Presentacion.Models;
+﻿namespace Presentacion.Models.Home;
 
 public class AdquisicionRecienteViewModel
 {

@@ -1,4 +1,4 @@
-﻿namespace Presentacion.Models;
+﻿namespace Presentacion.Models.Proveedores;
 
 public class ProveedorViewModel
 {

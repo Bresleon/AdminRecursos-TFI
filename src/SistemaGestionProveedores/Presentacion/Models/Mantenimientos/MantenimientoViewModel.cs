@@ -1,6 +1,6 @@
 ﻿using Dominio.Enums;
 
-namespace Presentacion.Models;
+namespace Presentacion.Models.Mantenimientos;
 
 public class MantenimientoViewModel
 {

@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc.Rendering;
 
-namespace Presentacion.Models;
+namespace Presentacion.Models.Adquisiciones;
 
 public class AdquisicionUpsertViewModel
 {
