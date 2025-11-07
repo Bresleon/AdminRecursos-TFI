@@ -8,7 +8,7 @@
 <h1 class="mb-4">Tus Proveedores</h1>
 
 <div class="d-flex justify-content-between align-items-center mb-3">
-	<a asp-action="Create" class="btn btn-primary">
+	<a asp-action="Crear" class="btn btn-primary">
 		<i class="bi bi-plus-circle"></i> Nuevo Proveedor
 	</a>
 
@@ -34,7 +34,7 @@
 				<th>CUIT</th>
 				<th>Monto Total Pagado</th>
 				<th>Calificación</th>
-				<th>Acciones</th>
+				<th></th>
 			</tr>
 		</thead>
 		<tbody>
@@ -47,14 +47,13 @@
 					<td>@proveedor.Calificacion</td>
 					<td>
 						<div class="btn-group" role="group">
-							<a asp-action="Edit" asp-route-id="@proveedor.Id" class="btn btn-sm btn-warning">
+							<a asp-action="Editar" asp-route-id="@proveedor.Id" class="btn btn-sm btn-warning">
 								<i class="bi bi-pencil"></i> Editar
 							</a>
-							<a asp-action="Details" asp-route-id="@proveedor.Id" class="btn btn-sm btn-info">
+							<a asp-action="Detalles" asp-route-id="@proveedor.Id" class="btn btn-sm btn-info">
 								<i class="bi bi-eye"></i> Detalles
 							</a>
-							<a asp-action="Delete" asp-route-id="@proveedor.Id" class="btn btn-sm btn-danger"
-							   onclick="return confirm('¿Está seguro de eliminar este proveedor?');">
+							<a asp-action="Eliminar" asp-route-id="@proveedor.Id" class="btn btn-sm btn-danger">
 								<i class="bi bi-trash"></i> Eliminar
 							</a>
 						</div>
