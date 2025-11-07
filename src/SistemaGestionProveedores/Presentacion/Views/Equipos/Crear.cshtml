@@ -1,0 +1,38 @@
+﻿@model EquipoViewModel
+
+@{
+    ViewData["Title"] = "Registrar Equipo";
+}
+
+<h2 class="mb-4">Registrar Equipo</h2>
+
+<form asp-action="Crear" method="post">
+    <div class="form-group mb-3">
+        <label asp-for="ProveedorId" class="form-label">Proveedor</label>
+        <select asp-for="ProveedorId" asp-items="Model.ProveedoresDisponibles" class="form-select">
+            <option value="">-- Seleccione un proveedor --</option>
+        </select>
+        <span asp-validation-for="ProveedorId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-3">
+        <label asp-for="TipoEquipoId" class="form-label">Tipo de Equipo</label>
+        <select asp-for="TipoEquipoId" asp-items="Model.TiposEquipoDisponibles" class="form-select">
+            <option value="">-- Seleccione un tipo de equipo --</option>
+        </select>
+        <span asp-validation-for="TipoEquipoId" class="text-danger"></span>
+    </div>
+
+    <div class="form-group mb-4">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" placeholder="Ej: Impresora Láser HP" />
+        <span asp-validation-for="Nombre" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Registrar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

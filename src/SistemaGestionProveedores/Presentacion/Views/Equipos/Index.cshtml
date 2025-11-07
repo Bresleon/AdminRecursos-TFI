@@ -1,0 +1,40 @@
+﻿@model IEnumerable<EquipoViewModel>
+
+@{
+    ViewData["Title"] = "Listado de Equipos";
+}
+
+<h2 class="mb-4">Listado de Equipos</h2>
+
+<p>
+    <a asp-action="Crear" class="btn btn-primary"><i class="bi bi-plus-circle"></i> Nuevo Equipo</a>
+</p>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Nombre</th>
+            <th>Tipo de Equipo</th>
+            <th>Proveedor</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var equipo in Model)
+        {
+            <tr>
+                <td>@equipo.Nombre</td>
+                <td>@equipo.TipoEquipoNombre</td>
+                <td>@equipo.ProveedorNombre</td>
+                <td class="text-center">
+                    <a asp-action="Editar" asp-route-id="@equipo.Id" class="btn btn-sm btn-warning">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-action="Eliminar" asp-route-id="@equipo.Id" class="btn btn-sm btn-danger">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
