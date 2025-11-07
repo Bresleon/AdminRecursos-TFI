@@ -123,36 +123,4 @@ public class AdquisicionesController : Controller
                 .ThenInclude(e => e.TipoEquipo)
             .FirstOrDefaultAsync(a => a.NumeroSerie == numeroSerie);
     }
-
-    #region AJAX_CALLS
-
-    [HttpGet]
-    public async Task<IActionResult> BuscarTecnicoPorDni(string dni)
-    {
-        var tecnico = await _context.Tecnicos
-            .Include(t => t.Proveedor)
-            .Include(t => t.Proveedor.Equipos)
-            .FirstOrDefaultAsync(t => t.DNI == dni);
-
-        if (tecnico == null)
-            return Json(null);
-
-        var equipos = tecnico.Proveedor.Equipos
-            .Select(e => new { id = e.Id, nombre = e.Nombre })
-            .ToList();
-
-        return Json(new
-        {
-            tecnico = new
-            {
-                id = tecnico.Id,
-                nombre = tecnico.Nombre,
-                apellido = tecnico.Apellido,
-                proveedor = tecnico.Proveedor.RazonSocial
-            },
-            equipos
-        });
-    }
-
-    #endregion
 }

@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <Folder Include="Views\Productos\" />
-    <Folder Include="Views\Visitas\" />
   </ItemGroup>
 
 </Project>

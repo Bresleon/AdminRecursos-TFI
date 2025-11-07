@@ -1,0 +1,143 @@
+﻿@model Presentacion.Models.MantenimientoUpsertViewModel
+
+@{
+    ViewData["Title"] = "Registrar Mantenimiento";
+}
+
+<h2 class="mb-4 text-center">Registrar Mantenimiento</h2>
+
+<!-- Mensaje de éxito o error -->
+@if (ViewBag.MensajeExito != null)
+{
+    <div class="alert alert-success">@ViewBag.MensajeExito</div>
+}
+@if (ViewBag.MensajeError != null)
+{
+    <div class="alert alert-danger">@ViewBag.MensajeError</div>
+}
+
+<form asp-action="Create" method="post" class="card shadow-lg border-0 p-4">
+    <div class="row g-3">
+
+        <div class="col-md-4">
+            <label for="dniTecnico" class="form-label">DNI del Técnico</label>
+            <input type="text" id="dniTecnico" name="dniTecnico" class="form-control" placeholder="Ingrese DNI del técnico" required />
+        </div>
+
+        <div class="col-md-4">
+            <label for="nombreTecnico" class="form-label">Técnico</label>
+            <input type="text" id="nombreTecnico" class="form-control" readonly placeholder="Nombre y Apellido del Técnico" />
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="button" id="btnBuscarTecnico" class="btn btn-outline-primary w-100">
+                <i class="bi bi-search"></i> Buscar Técnico
+            </button>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="AdquisicionId" class="form-label">Número de Serie</label>
+            <input asp-for="NumeroSerie" class="form-control" placeholder="Ingrese número de serie" required />
+            <span asp-validation-for="NumeroSerie" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="TipoMantenimientoId" class="form-label">Tipo de Mantenimiento</label>
+            <select asp-for="TipoMantenimientoId" class="form-select" asp-items="Model.TiposMantenimientoDisponibles" id="tipoMantenimiento" required>
+                <option value="">Seleccione tipo</option>
+            </select>
+            <span asp-validation-for="TipoMantenimientoId" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Estado" class="form-label">Estado</label>
+            <select asp-for="Estado" class="form-select" asp-items="Model.EstadosDisponibles" id="estado" required></select>
+            <span asp-validation-for="Estado" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-12">
+            <label asp-for="Descripcion" class="form-label">Descripción de las acciones realizadas</label>
+            <textarea asp-for="Descripcion" class="form-control" rows="3" placeholder="Detalle las acciones realizadas en el mantenimiento" required></textarea>
+            <span asp-validation-for="Descripcion" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Costo" class="form-label">Costo del mantenimiento</label>
+            <input asp-for="Costo" class="form-control" type="number" step="0.01" min="0" id="costo" required />
+            <span asp-validation-for="Costo" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4" id="calificacionContainer" style="display:none;">
+            <label asp-for="Calificacion" class="form-label">Calificación (0 - 5)</label>
+            <input asp-for="Calificacion" class="form-control" type="number" step="0.1" min="0" max="5" />
+            <span asp-validation-for="Calificacion" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <button type="submit" class="btn btn-success">
+            <i class="bi bi-check-circle"></i> Guardar Mantenimiento
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Volver
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // --- Buscar técnico por DNI (simulación o llamada real AJAX) ---
+        document.getElementById('btnBuscarTecnico').addEventListener('click', async function () {
+            const dni = document.getElementById('dniTecnico').value.trim();
+
+            if (!dni) {
+                alert("Por favor ingrese un DNI.");
+                return;
+            }
+
+            try {
+                // Llamada a endpoint del backend que busca el técnico por DNI
+                const response = await fetch(`/Tecnicos/BuscarTecnicoPorDni?dni=${dni}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('nombreTecnico').value = `${data.tecnico.nombre} ${data.tecnico.apellido}`;
+                } else {
+                    document.getElementById('nombreTecnico').value = "";
+                    alert("No se encontró ningún técnico con ese DNI.");
+                }
+            } catch {
+                alert("Error al buscar el técnico. Intente nuevamente.");
+            }
+        });
+
+        // --- Escenario 6c: Reparación en garantía => costo 0 ---
+        document.getElementById('tipoMantenimiento').addEventListener('change', function () {
+            const texto = this.options[this.selectedIndex].text.toLowerCase();
+            const costoInput = document.getElementById('costo');
+
+            if (texto.includes('garantía')) {
+                costoInput.value = 0;
+                costoInput.readOnly = true;
+            } else {
+                costoInput.readOnly = false;
+            }
+        });
+
+        // --- Escenario 6d: Estado FINALIZADO => mostrar calificación ---
+        document.getElementById('estado').addEventListener('change', function () {
+            const calificacionContainer = document.getElementById('calificacionContainer');
+            const texto = this.options[this.selectedIndex].text.toUpperCase();
+
+            if (texto === 'FINALIZADO') {
+                calificacionContainer.style.display = 'block';
+            } else {
+                calificacionContainer.style.display = 'none';
+                document.querySelector('[name="Calificacion"]').value = '';
+            }
+        });
+    </script>
+}

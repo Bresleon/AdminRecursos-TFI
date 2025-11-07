@@ -4,9 +4,10 @@ namespace Presentacion.Models;
 
 public class MantenimientoViewModel
 {
+    public Guid Id { get; set; }
     public string NumeroSerie { get; set; } = string.Empty;
-    public string Nombre { get; set; } = string.Empty;
-    public string TipoProducto { get; set; } = string.Empty;
+    public string Equipo { get; set; } = string.Empty;
+    public string TipoEquipo { get; set; } = string.Empty;
 
     public Estado Estado { get; set; }
     public DateOnly Fecha { get; set; }

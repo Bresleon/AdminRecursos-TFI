@@ -1,0 +1,86 @@
+﻿@model MantenimientoViewModel
+@using Dominio.Enums
+
+@{
+    ViewData["Title"] = "Detalles del Mantenimiento";
+}
+
+<h2 class="mb-4 text-center">Detalles del Mantenimiento</h2>
+
+<div class="card shadow-lg border-0">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">
+            <i class="bi bi-wrench"></i> Información del Mantenimiento
+        </h5>
+    </div>
+    <div class="card-body">
+
+        <dl class="row mb-0">
+            <dt class="col-sm-4">Número de Serie</dt>
+            <dd class="col-sm-8">@Model.NumeroSerie</dd>
+
+            <dt class="col-sm-4">Equipo</dt>
+            <dd class="col-sm-8">@Model.Equipo</dd>
+
+            <dt class="col-sm-4">Tipo de Equipo</dt>
+            <dd class="col-sm-8">@Model.TipoEquipo</dd>
+
+            <dt class="col-sm-4">Tipo de Mantenimiento</dt>
+            <dd class="col-sm-8">@Model.TipoMantenimiento</dd>
+
+            <dt class="col-sm-4">Estado</dt>
+            <dd class="col-sm-8">
+                <span class="badge @(Model.Estado == Estado.FINALIZADO ? "bg-success"
+                                          : Model.Estado == Estado.PENDIENTE ? "bg-warning text-dark" : "bg-secondary")">
+                    @Model.Estado
+                </span>
+            </dd>
+
+            <dt class="col-sm-4">Fecha</dt>
+            <dd class="col-sm-8">@Model.Fecha.ToString("dd/MM/yyyy")</dd>
+
+            <dt class="col-sm-4">Descripción</dt>
+            <dd class="col-sm-8">@Model.Descripcion</dd>
+
+            <dt class="col-sm-4">Costo</dt>
+            <dd class="col-sm-8">$@Model.Costo.ToString("N2")</dd>
+
+            <dt class="col-sm-4">Calificación</dt>
+            <dd class="col-sm-8">
+                <span class="text-warning">
+                    @{
+                        for (int i = 0; i < Math.Round(Model.Calificacion); i++)
+                        {
+                            <i class="bi bi-star-fill"></i>
+                        }
+                        for (int i = (int)Math.Round(Model.Calificacion); i < 5; i++)
+                        {
+                            <i class="bi bi-star"></i>
+                        }
+                    }
+                </span>
+                <span class="ms-1">(@Model.Calificacion.ToString("0.0"))</span>
+            </dd>
+        </dl>
+
+        <hr />
+
+        <h5 class="mt-4"><i class="bi bi-person-badge"></i> Técnico Responsable</h5>
+        <dl class="row">
+            <dt class="col-sm-4">Nombre Completo</dt>
+            <dd class="col-sm-8">@Model.NombreCompletoTecnico</dd>
+
+            <dt class="col-sm-4">DNI</dt>
+            <dd class="col-sm-8">@Model.DNITecnico</dd>
+        </dl>
+
+        <div class="mt-4">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Editar
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Volver a la lista
+            </a>
+        </div>
+    </div>
+</div>
