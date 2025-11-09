@@ -1,31 +1,30 @@
-﻿using Infraestructura.Datos;
+﻿using Aplicacion.Interfaces.Servicios;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Presentacion.Models.Proveedores;
 
 namespace Presentacion.Controllers;
 
 public class ProveedoresController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IProveedorServicio _servicio;
 
-    public ProveedoresController(ApplicationDbContext context)
+    public ProveedoresController(IProveedorServicio servicio)
     {
-        _context = context;
+        _servicio = servicio;
     }
 
     public async Task<IActionResult> Index(string sortOrder)
     {
         ViewData["SortOrder"] = sortOrder ?? "";
 
-        var proveedores = await _context.Proveedores.ToListAsync();
+        var proveedores = await _servicio.ObtenerTodos();
 
         var proveedoresVM = proveedores.Select(p => new ProveedorViewModel
         {
             Id = p.Id,
             RazonSocial = p.RazonSocial,
             CUIT = p.CUIT,
-            MontoTotalPagado = CalcularMontoTotalPagado(p.Id),
+            //MontoTotalPagado = CalcularMontoTotalPagado(p.Id),
             Calificacion = p.Calificacion
         }).ToList();
 
@@ -46,9 +45,9 @@ public class ProveedoresController : Controller
         return View();
     }
 
-    public IActionResult Editar(Guid id)
+    public async Task<IActionResult> Editar(Guid id)
     {
-        var proveedor = _context.Proveedores.Find(id);
+        var proveedor = await _servicio.Obtener(id);
 
         if (proveedor == null)
         {
@@ -68,9 +67,9 @@ public class ProveedoresController : Controller
         return View(proveedorVM);
     }
 
-    public IActionResult Detalles(Guid id)
+    public async Task<IActionResult> Detalles(Guid id)
     {
-        var proveedor = _context.Proveedores.Find(id);
+        var proveedor = await _servicio.Obtener(id);
 
         if (proveedor == null)
         {
@@ -86,15 +85,15 @@ public class ProveedoresController : Controller
             Direccion = proveedor.Direccion,
             Telefono = proveedor.Telefono,
             Calificacion = proveedor.Calificacion,
-            MontoTotalPagado = CalcularMontoTotalPagado(proveedor.Id)
+            //MontoTotalPagado = CalcularMontoTotalPagado(proveedor.Id)
         };
 
         return View(proveedorVM);
     }
 
-    public IActionResult Eliminar(Guid id)
+    public async Task<IActionResult> Eliminar(Guid id)
     {
-        var proveedor = _context.Proveedores.Find(id);
+        var proveedor = await _servicio.Obtener(id);
 
         if (proveedor == null)
         {
@@ -114,20 +113,21 @@ public class ProveedoresController : Controller
         return View(proveedorVM);
     }
 
-    private decimal CalcularMontoTotalPagado(Guid proveedorId)
-    {
-        var montoTotalAdquisiciones = _context.Adquisiciones
-            .Include(a => a.Tecnico)
-                .ThenInclude(t => t.Proveedor)
-            .Where(a => a.Tecnico.ProveedorId == proveedorId)
-            .Sum(a => a.Costo);
+    // TODO: Incluir uso de AdquisicionServicio y MantenimientoServicio
+    //private decimal CalcularMontoTotalPagado(Guid proveedorId)
+    //{
+    //    var montoTotalAdquisiciones = _context.Adquisiciones
+    //        .Include(a => a.Tecnico)
+    //            .ThenInclude(t => t.Proveedor)
+    //        .Where(a => a.Tecnico.ProveedorId == proveedorId)
+    //        .Sum(a => a.Costo);
 
-        var montoTotalMantenimientos = _context.Mantenimientos
-            .Include(m => m.Tecnico)
-                .ThenInclude(t => t.Proveedor)
-            .Where(m => m.Tecnico.ProveedorId == proveedorId)
-            .Sum(m => m.Costo);
+    //    var montoTotalMantenimientos = _context.Mantenimientos
+    //        .Include(m => m.Tecnico)
+    //            .ThenInclude(t => t.Proveedor)
+    //        .Where(m => m.Tecnico.ProveedorId == proveedorId)
+    //        .Sum(m => m.Costo);
 
-        return montoTotalAdquisiciones + montoTotalMantenimientos;
-    }
+    //    return montoTotalAdquisiciones + montoTotalMantenimientos;
+    //}
 }

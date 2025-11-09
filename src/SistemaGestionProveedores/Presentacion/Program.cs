@@ -1,4 +1,8 @@
+using Aplicacion.Interfaces.Repositorios;
+using Aplicacion.Interfaces.Servicios;
+using Aplicacion.Servicios;
 using Infraestructura.Datos;
+using Infraestructura.Repositorios;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +11,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped(typeof(IRepositorio<>), typeof(Repositorio<>));
+builder.Services.AddScoped<IProveedorRepositorio, ProveedorRepositorio>();
+builder.Services.AddScoped<IProveedorServicio, ProveedorServicio>();
 
 builder.Services.AddControllersWithViews();
 
