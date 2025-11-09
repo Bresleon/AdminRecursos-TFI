@@ -1,26 +1,26 @@
-﻿using Infraestructura.Datos;
+﻿using Aplicacion.Interfaces.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Presentacion.Models.Equipos;
 
 namespace Presentacion.Controllers;
 
 public class EquiposController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IEquipoServicio _equipoServ;
+    private readonly IProveedorServicio _proveedorServ;
+    private readonly ITipoEquipoServicio _tipoEquipoServ;
 
-    public EquiposController(ApplicationDbContext context)
+    public EquiposController(IEquipoServicio equipoServ, IProveedorServicio proveedorServ, ITipoEquipoServicio tipoEquipoServ)
     {
-        _context = context;
+        _equipoServ = equipoServ;
+        _proveedorServ = proveedorServ;
+        _tipoEquipoServ = tipoEquipoServ;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var equipos = _context.Equipos
-            .Include(e => e.Proveedor)
-            .Include(e => e.TipoEquipo)
-            .ToList();
+        var equipos = await _equipoServ.ObtenerTodos();
 
         var equiposVM = equipos.Select(e => new EquipoViewModel
         {
@@ -35,10 +35,10 @@ public class EquiposController : Controller
         return View(equiposVM);
     }
 
-    public IActionResult Crear()
+    public async Task<IActionResult> Crear()
     {
-        var proveedores = _context.Proveedores.ToList();
-        var tiposEquipo = _context.TiposEquipo.ToList();
+        var proveedores = await _proveedorServ.ObtenerTodos();
+        var tiposEquipo = await _tipoEquipoServ.ObtenerTodos();
 
         var equipoVM = new EquipoViewModel
         {
@@ -58,17 +58,17 @@ public class EquiposController : Controller
         return View(equipoVM);
     }
 
-    public IActionResult Editar(Guid id)
+    public async Task<IActionResult> Editar(Guid id)
     {
-        var equipo = _context.Equipos.Find(id);
+        var equipo = await _equipoServ.Obtener(id);
 
         if (equipo == null)
         {
             return NotFound();
         }
 
-        var proveedores = _context.Proveedores.ToList();
-        var tiposEquipo = _context.TiposEquipo.ToList();
+        var proveedores = await _proveedorServ.ObtenerTodos();
+        var tiposEquipo = await _tipoEquipoServ.ObtenerTodos();
 
         var equipoVM = new EquipoViewModel
         {
@@ -95,10 +95,7 @@ public class EquiposController : Controller
 
     public async Task<IActionResult> Eliminar(Guid id)
     {
-        var equipo = await _context.Equipos
-            .Include(e => e.Proveedor)
-            .Include(e => e.TipoEquipo)
-            .FirstOrDefaultAsync(e => e.Id == id);
+        var equipo = await _equipoServ.Obtener(id);
 
         if (equipo == null)
         {
