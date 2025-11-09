@@ -17,6 +17,10 @@ builder.Services.AddScoped<IProveedorRepositorio, ProveedorRepositorio>();
 builder.Services.AddScoped<IProveedorServicio, ProveedorServicio>();
 builder.Services.AddScoped<ITecnicoRepositorio, TecnicoRepositorio>();
 builder.Services.AddScoped<ITecnicoServicio, TecnicoServicio>();
+builder.Services.AddScoped<IEquipoRepositorio, EquipoRepositorio>();
+builder.Services.AddScoped<IEquipoServicio, EquipoServicio>();
+builder.Services.AddScoped<ITipoEquipoRepositorio, TipoEquipoRepositorio>();
+builder.Services.AddScoped<ITipoEquipoServicio, TipoEquipoServicio>();
 
 builder.Services.AddControllersWithViews();
 
