@@ -1,9 +1,7 @@
 ﻿namespace Dominio.Entidades;
 
-public class Tecnico
+public class Tecnico : EntidadBase
 {
-    public Guid Id { get; set; }
-
     public Guid ProveedorId { get; set; }
     public Proveedor Proveedor { get; set; }
 

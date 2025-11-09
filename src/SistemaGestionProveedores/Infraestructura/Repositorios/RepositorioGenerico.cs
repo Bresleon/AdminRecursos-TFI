@@ -1,11 +1,12 @@
 ﻿using Aplicacion.Interfaces.Repositorios;
+using Dominio.Entidades;
 using Infraestructura.Datos;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace Infraestructura.Repositorios;
 
-public class Repositorio<T> : IRepositorio<T> where T : class
+public class Repositorio<T> : IRepositorio<T> where T : EntidadBase
 {
     private readonly ApplicationDbContext _context;
     private readonly DbSet<T> _dbSet;
@@ -58,7 +59,7 @@ public class Repositorio<T> : IRepositorio<T> where T : class
                 query = query.Include(include);
         }
 
-        return await _dbSet.FindAsync(id);
+        return await query.FirstOrDefaultAsync(e => e.Id == id);
     }
 
     public async Task<IEnumerable<T>> ObtenerTodos(

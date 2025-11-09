@@ -1,9 +1,7 @@
 ﻿namespace Dominio.Entidades;
 
-public class Adquisicion
+public class Adquisicion : EntidadBase
 {
-    public Guid Id { get; set; }
-
     public Guid EquipoId { get; set; }
     public Equipo Equipo { get; set; }
 

@@ -1,8 +1,7 @@
 ﻿namespace Dominio.Entidades;
 
-public class Proveedor
+public class Proveedor : EntidadBase
 {
-    public Guid Id { get; set; }
     public string RazonSocial { get; set; }
     public string CUIT { get; set; }
     public string? Email { get; set; }
