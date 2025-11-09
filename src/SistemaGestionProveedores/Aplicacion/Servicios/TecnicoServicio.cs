@@ -40,7 +40,7 @@ public class TecnicoServicio : ITecnicoServicio
 
     public async Task<Tecnico?> Obtener(Guid id)
     {
-        var tecnico = await _repo.ObtenerPorId(id, t => t.Proveedor);
+        var tecnico = await _repo.ObtenerPorId(id, t => t.Proveedor, t => t.Proveedor.Equipos);
 
         if (tecnico == null)
             throw new Exception("No se pudo encontrar el tecnico");
@@ -50,7 +50,7 @@ public class TecnicoServicio : ITecnicoServicio
 
     public async Task<Tecnico?> Obtener(string dni)
     {
-        var tecnico = await _repo.Obtener(t => t.DNI == dni, t => t.Proveedor);
+        var tecnico = await _repo.Obtener(t => t.DNI == dni, t => t.Proveedor, t => t.Proveedor.Equipos);
 
         if (tecnico == null)
             throw new Exception("No se pudo encontrar el tecnico");
@@ -60,6 +60,8 @@ public class TecnicoServicio : ITecnicoServicio
 
     public async Task<IEnumerable<Tecnico>> ObtenerTodos(Expression<Func<Tecnico, bool>>? filtro = null)
     {
-        return await (filtro == null ? _repo.ObtenerTodos() : _repo.ObtenerTodos(filtro));
+        return await (filtro == null
+            ? _repo.ObtenerTodos(includes: [t => t.Proveedor, t => t.Proveedor.Equipos])
+            : _repo.ObtenerTodos(filtro, includes: [t => t.Proveedor, t => t.Proveedor.Equipos]));
     }
 }

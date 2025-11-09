@@ -1,29 +1,29 @@
-﻿using Infraestructura.Datos;
+﻿using Aplicacion.Interfaces.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Presentacion.Models.Tecnicos;
 
 namespace Presentacion.Controllers;
 
 public class TecnicosController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly ITecnicoServicio _tecnicoServ;
+    private readonly IProveedorServicio _proveedorServ;
 
-    public TecnicosController(ApplicationDbContext context)
+    public TecnicosController(ITecnicoServicio tecnicoServ, IProveedorServicio proveedorServ)
     {
-        _context = context;
+        _tecnicoServ = tecnicoServ;
+        _proveedorServ = proveedorServ;
     }
 
-    public IActionResult Index(string? dni = null)
-    {
-        var tecnicos = _context.Tecnicos.AsQueryable();
 
-        if (!string.IsNullOrEmpty(dni))
-        {
-            ViewData["DNI"] = dni;
-            tecnicos = tecnicos.Where(t => t.DNI == dni);
-        }
+    public async Task<IActionResult> Index(string? dni = null)
+    {
+        var tecnicos = !string.IsNullOrEmpty(dni) 
+            ? await _tecnicoServ.ObtenerTodos(t => t.DNI == dni)
+            : await _tecnicoServ.ObtenerTodos();
+
+        ViewData["DNI"] = dni;
 
         var tecnicosVM = tecnicos.Select(t => new TecnicoViewModel
         {
@@ -39,29 +39,27 @@ public class TecnicosController : Controller
         return View(tecnicosVM);
     }
 
-    public IActionResult Crear()
+    public async Task<IActionResult> Crear()
     {
-        var proveedores = _context.Proveedores
-            .Select(p => new SelectListItem
-            {
-                Value = p.Id.ToString(),
-                Text = p.RazonSocial
-            })
-            .ToList();
+        var proveedores = await _proveedorServ.ObtenerTodos();
+
+        var proveedoresSelect = proveedores.Select(p => new SelectListItem
+        {
+            Value = p.Id.ToString(),
+            Text = p.RazonSocial
+        }).ToList();
 
         var tecnicoVM = new TecnicoViewModel
         {
-            ProveedoresDisponibles = proveedores
+            ProveedoresDisponibles = proveedoresSelect
         };
 
         return View(tecnicoVM);
     }
 
-    public IActionResult Detalles(Guid id)
+    public async Task<IActionResult> Detalles(Guid id)
     {
-        var tecnico = _context.Tecnicos
-            .Include(t => t.Proveedor)
-            .FirstOrDefault(t => t.Id == id);
+        var tecnico = await _tecnicoServ.Obtener(id);
 
         if (tecnico == null)
             return NotFound();
@@ -80,22 +78,20 @@ public class TecnicosController : Controller
         return View(tecnicoVM);
     }
 
-    public IActionResult Editar(Guid id)
+    public async Task<IActionResult> Editar(Guid id)
     {
-        var tecnico = _context.Tecnicos
-            .Include(t => t.Proveedor)
-            .FirstOrDefault(t => t.Id == id);
+        var tecnico = await _tecnicoServ.Obtener(id);
 
         if (tecnico == null)
             return NotFound();
 
-        var proveedores = _context.Proveedores
-            .Select(p => new SelectListItem
-            {
-                Value = p.Id.ToString(),
-                Text = p.RazonSocial
-            })
-            .ToList();
+        var proveedores = await _proveedorServ.ObtenerTodos();
+
+        var proveedoresSelect = proveedores.Select(p => new SelectListItem
+        {
+            Value = p.Id.ToString(),
+            Text = p.RazonSocial
+        }).ToList();
 
         var tecnicoVM = new TecnicoViewModel
         {
@@ -105,17 +101,15 @@ public class TecnicosController : Controller
             DNI = tecnico.DNI,
             Telefono = tecnico.Telefono,
             ProveedorId = tecnico.Proveedor.Id,
-            ProveedoresDisponibles = proveedores
+            ProveedoresDisponibles = proveedoresSelect
         };
 
         return View(tecnicoVM);
     }
 
-    public IActionResult Eliminar(Guid id)
+    public async Task<IActionResult> Eliminar(Guid id)
     {
-        var tecnico = _context.Tecnicos
-            .Include(t => t.Proveedor)
-            .FirstOrDefault(t => t.Id == id);
+        var tecnico = await _tecnicoServ.Obtener(id);
 
         if (tecnico == null)
             return NotFound();
@@ -137,10 +131,7 @@ public class TecnicosController : Controller
     [HttpGet]
     public async Task<IActionResult> BuscarTecnicoPorDni(string dni)
     {
-        var tecnico = await _context.Tecnicos
-            .Include(t => t.Proveedor)
-            .Include(t => t.Proveedor.Equipos)
-            .FirstOrDefaultAsync(t => t.DNI == dni);
+        var tecnico = await _tecnicoServ.Obtener(dni);
 
         if (tecnico == null)
             return Json(null);
