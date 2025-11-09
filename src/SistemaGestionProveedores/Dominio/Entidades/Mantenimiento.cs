@@ -2,10 +2,8 @@
 
 namespace Dominio.Entidades;
 
-public class Mantenimiento
+public class Mantenimiento : EntidadBase
 {
-    public Guid Id { get; set; }
-
     public Guid AdquisicionId { get; set; }
     public Adquisicion Adquisicion { get; set; }
 

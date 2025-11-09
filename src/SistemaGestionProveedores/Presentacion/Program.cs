@@ -15,6 +15,8 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 builder.Services.AddScoped(typeof(IRepositorio<>), typeof(Repositorio<>));
 builder.Services.AddScoped<IProveedorRepositorio, ProveedorRepositorio>();
 builder.Services.AddScoped<IProveedorServicio, ProveedorServicio>();
+builder.Services.AddScoped<ITecnicoRepositorio, TecnicoRepositorio>();
+builder.Services.AddScoped<ITecnicoServicio, TecnicoServicio>();
 
 builder.Services.AddControllersWithViews();
 
