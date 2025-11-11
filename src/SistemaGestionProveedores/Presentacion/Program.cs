@@ -23,6 +23,10 @@ builder.Services.AddScoped<ITipoEquipoRepositorio, TipoEquipoRepositorio>();
 builder.Services.AddScoped<ITipoEquipoServicio, TipoEquipoServicio>();
 builder.Services.AddScoped<IAdquisicionRepositorio, AdquisicionRepositorio>();
 builder.Services.AddScoped<IAdquisicionServicio, AdquisicionServicio>();
+builder.Services.AddScoped<IMantenimientoRepositorio, MantenimientoRepositorio>();
+builder.Services.AddScoped<IMantenimientoServicio, MantenimientoServicio>();
+builder.Services.AddScoped<ITipoMantenimientoRepositorio, TipoMantenimientoRepositorio>();
+builder.Services.AddScoped<ITipoMantenimientoServicio, TipoMantenimientoServicio>();
 
 builder.Services.AddControllersWithViews();
 
