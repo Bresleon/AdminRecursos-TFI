@@ -99,9 +99,43 @@ public class ProveedoresController : Controller
             Email = proveedor.Email,
             Direccion = proveedor.Direccion,
             Telefono = proveedor.Telefono,
+            Calificacion = proveedor.Calificacion
         };
 
         return View(proveedorVM);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Editar(ProveedorViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            return View(modelo);
+        }
+
+        var proveedor = new Proveedor
+        {
+            Id = modelo.Id,
+            RazonSocial = modelo.RazonSocial,
+            CUIT = modelo.CUIT,
+            Email = modelo.Email,
+            Direccion = modelo.Direccion,
+            Telefono = modelo.Telefono,
+            Calificacion = modelo.Calificacion,
+        };
+
+        try
+        {
+            await _proveedorServ.Modificar(proveedor);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Detalles(Guid id)
