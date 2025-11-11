@@ -1,30 +1,27 @@
-﻿using Dominio.Enums;
-using Infraestructura.Datos;
+﻿using Aplicacion.Interfaces.Servicios;
+using Dominio.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Presentacion.Models.Mantenimientos;
 
 namespace Presentacion.Controllers;
 
 public class MantenimientosController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    private readonly IMantenimientoServicio _mantenimientoServ;
+    private readonly ITecnicoServicio _tecnicoServ;
+    private readonly ITipoMantenimientoServicio _tipoMantenimientoServ;
 
-    public MantenimientosController(ApplicationDbContext context)
+    public MantenimientosController(IMantenimientoServicio mantenimientoServ, ITecnicoServicio tecnicoServ, ITipoMantenimientoServicio tipoMantenimientoServ)
     {
-        _context = context;
+        _mantenimientoServ = mantenimientoServ;
+        _tecnicoServ = tecnicoServ;
+        _tipoMantenimientoServ = tipoMantenimientoServ;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var mantenimientos = _context.Mantenimientos
-            .Include(m => m.Adquisicion)
-                .ThenInclude(a => a.Equipo)
-                .ThenInclude(e => e.TipoEquipo)
-            .Include(m => m.TipoMantenimiento)
-            .Include(m => m.Tecnico)
-            .ToList();
+        var mantenimientos = await _mantenimientoServ.ObtenerTodos();
 
         var mantenimientosVM = mantenimientos.Select(m => new MantenimientoViewModel
         {
@@ -45,9 +42,9 @@ public class MantenimientosController : Controller
         return View(mantenimientosVM);
     }
 
-    public IActionResult Crear()
+    public async Task<IActionResult> Crear()
     {
-        var (tecnicos, tiposMantenimiento, estados) = ObtenerListasDesplegablesMantenimiento();
+        var (tecnicos, tiposMantenimiento, estados) = await ObtenerListasDesplegablesMantenimiento();
 
         var mantenimientoVM = new MantenimientoUpsertViewModel
         {
@@ -59,15 +56,9 @@ public class MantenimientosController : Controller
         return View(mantenimientoVM);
     }
 
-    public IActionResult Detalles(Guid id)
+    public async Task<IActionResult> Detalles(Guid id)
     {
-        var mantenimiento = _context.Mantenimientos
-            .Include(m => m.Adquisicion)
-                .ThenInclude(a => a.Equipo)
-                .ThenInclude(e => e.TipoEquipo)
-            .Include(m => m.TipoMantenimiento)
-            .Include(m => m.Tecnico)
-            .FirstOrDefault(m => m.Id == id);
+        var mantenimiento = await _mantenimientoServ.Obtener(id);
 
         var mantenimientoVM = new MantenimientoViewModel
         {
@@ -88,17 +79,11 @@ public class MantenimientosController : Controller
         return View(mantenimientoVM);
     }
 
-    public IActionResult Editar(Guid id)
+    public async Task<IActionResult> Editar(Guid id)
     {
-        var mantenimiento = _context.Mantenimientos
-            .Include(m => m.Adquisicion)
-                .ThenInclude(a => a.Equipo)
-                .ThenInclude(e => e.TipoEquipo)
-            .Include(m => m.TipoMantenimiento)
-            .Include(m => m.Tecnico)
-            .FirstOrDefault(m => m.Id == id);
+        var mantenimiento = await _mantenimientoServ.Obtener(id);
 
-        var (tecnicos, tiposMantenimiento, estados) = ObtenerListasDesplegablesMantenimiento();
+        var (tecnicos, tiposMantenimiento, estados) = await ObtenerListasDesplegablesMantenimiento();
 
         var mantenimientoVM = new MantenimientoUpsertViewModel
         {
@@ -122,17 +107,18 @@ public class MantenimientosController : Controller
         return View(mantenimientoVM);
     }
 
-    private (List<SelectListItem>, List<SelectListItem>, List<SelectListItem>) ObtenerListasDesplegablesMantenimiento()
+    private async Task<(List<SelectListItem>, List<SelectListItem>, List<SelectListItem>)> ObtenerListasDesplegablesMantenimiento()
     {
         // TODO: Debería buscar solo técnicos que trabajen en la misma empresa que el técnico que vendió el equipo
-        var tecnicos = _context.Tecnicos
-            .Select(t => new SelectListItem
+        var tecnicos = await _tecnicoServ.ObtenerTodos();
+        var tecnicosSelect = tecnicos.Select(t => new SelectListItem
             {
                 Value = t.Id.ToString(),
                 Text = $"{t.Nombre} {t.Apellido} - DNI: {t.DNI}"
             }).ToList();
 
-        var tiposMantenimiento = _context.TiposMantenimiento
+        var tiposMantenimiento = await _tipoMantenimientoServ.ObtenerTodos();
+        var tiposMantenimientoSelect = tiposMantenimiento
             .Select(tm => new SelectListItem
             {
                 Value = tm.Id.ToString(),
@@ -145,6 +131,6 @@ public class MantenimientosController : Controller
             new SelectListItem { Value = Estado.FINALIZADO.ToString(), Text = "Finalizado" }
         };
 
-        return (tecnicos, tiposMantenimiento, estados);
+        return (tecnicosSelect, tiposMantenimientoSelect, estados);
     }
 }
