@@ -1,19 +1,17 @@
 ﻿using Aplicacion.Interfaces.Servicios;
+using Dominio.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Presentacion.Models.Adquisiciones;
+using Presentacion.Models.Tecnicos;
+using System.Threading.Tasks;
 
 namespace Presentacion.Controllers;
 
 public class AdquisicionesController : Controller
 {
-    //private readonly ApplicationDbContext _context;
     private readonly IAdquisicionServicio _servicio;
 
-    //public AdquisicionesController(ApplicationDbContext context)
-    //{
-    //    _context = context;
-    //}
     public AdquisicionesController(IAdquisicionServicio servicio)
     {
         _servicio = servicio;
@@ -21,12 +19,6 @@ public class AdquisicionesController : Controller
 
     public async Task<IActionResult> Index()
     {
-        //var adquisiciones = _context.Adquisiciones
-        //    .Include(a => a.Tecnico)
-        //    .Include(a => a.Equipo)
-        //        .ThenInclude(e => e.TipoEquipo)
-        //    .ToList()
-        //    .OrderByDescending(a => a.FechaAdquisicion);
         var adquisiciones = await _servicio.ObtenerTodos();
 
         var adquisicionesVM = adquisiciones.Select(a => new AdquisicionViewModel
@@ -50,6 +42,44 @@ public class AdquisicionesController : Controller
         return View();
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Crear(AdquisicionUpsertViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            return View(modelo);
+        }
+
+        if (modelo.Costo <= 0)
+        {
+            ModelState.AddModelError("Costo", "El costo de la adquisición debe ser mayor a cero");
+            return View(modelo);
+        }
+
+        var adquisicion = new Adquisicion
+        {
+            EquipoId = modelo.EquipoId,
+            TecnicoId = modelo.TecnicoId,
+            NumeroSerie = modelo.NumeroSerie,
+            FechaAdquisicion = modelo.FechaAdquisicion,
+            FechaFinGarantia = modelo.FechaFinGarantia,
+            Costo = modelo.Costo,
+        };
+
+        try
+        {
+            await _servicio.Agregar(adquisicion);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     public IActionResult Consultar()
     {
         return View();
@@ -57,7 +87,6 @@ public class AdquisicionesController : Controller
 
     public async Task<IActionResult> Editar(Guid id)
     {
-        //var adquisicion = await ObtenerAdquisicion(id);
         var adquisicion = await _servicio.Obtener(id);
 
         var adquisicionEditVM = new AdquisicionUpsertViewModel
@@ -71,22 +100,56 @@ public class AdquisicionesController : Controller
             Costo = adquisicion.Costo,
             NombreCompletoTecnico = $"{adquisicion.Tecnico.Nombre} {adquisicion.Tecnico.Apellido}",
             NombreProveedor = adquisicion.Tecnico.Proveedor.RazonSocial,
-            EquiposDisponibles = adquisicion.Tecnico.Proveedor.Equipos
-                .Select(e => new SelectListItem
-                {
-                    Value = e.Id.ToString(),
-                    Text = e.Nombre
-                })
-                .ToList()
+            EquiposDisponibles = await ObtenerEquiposDisponiblesSelect(id)
         };
 
         return View(adquisicionEditVM);
     }
 
     [HttpPost]
+    public async Task<IActionResult> Editar(AdquisicionUpsertViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            modelo.EquiposDisponibles = await ObtenerEquiposDisponiblesSelect(modelo.Id);
+            return View(modelo);
+        }
+
+        if (modelo.Costo <= 0)
+        {
+            ModelState.AddModelError("Costo", "El costo de la adquisición debe ser mayor a cero");
+            modelo.EquiposDisponibles = await ObtenerEquiposDisponiblesSelect(modelo.Id);
+            return View(modelo);
+        }
+
+        var adquisicion = new Adquisicion
+        {
+            Id = modelo.Id,
+            EquipoId = modelo.EquipoId,
+            TecnicoId = modelo.TecnicoId,
+            NumeroSerie = modelo.NumeroSerie,
+            FechaAdquisicion = modelo.FechaAdquisicion,
+            FechaFinGarantia = modelo.FechaFinGarantia,
+            Costo = modelo.Costo,
+        };
+
+        try
+        {
+            await _servicio.Modificar(adquisicion);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpPost]
     public async Task<IActionResult> Consultar(string numeroSerie)
     {
-        //var adquisicion = await ObtenerAdquisicion(numeroSerie);
         var adquisicion = await _servicio.Obtener(numeroSerie);
 
         if (adquisicion == null)
@@ -110,23 +173,16 @@ public class AdquisicionesController : Controller
         return View(adquisicionVM);
     }
 
-    //private async Task<Adquisicion?> ObtenerAdquisicion(Guid id)
-    //{
-    //    return await _context.Adquisiciones
-    //        .Include(a => a.Tecnico)
-    //            .ThenInclude(t => t.Proveedor)
-    //                .ThenInclude(p => p.Equipos)
-    //        .Include(a => a.Equipo)
-    //            .ThenInclude(e => e.TipoEquipo)
-    //        .FirstOrDefaultAsync(a => a.Id == id);
-    //}
+    private async Task<List<SelectListItem>> ObtenerEquiposDisponiblesSelect(Guid adquisicionId)
+    {
+        var adquisicion = await _servicio.Obtener(adquisicionId);
 
-    //private async Task<Adquisicion?> ObtenerAdquisicion(string numeroSerie)
-    //{
-    //    return await _context.Adquisiciones
-    //        .Include(a => a.Tecnico)
-    //        .Include(a => a.Equipo)
-    //            .ThenInclude(e => e.TipoEquipo)
-    //        .FirstOrDefaultAsync(a => a.NumeroSerie == numeroSerie);
-    //}
+        return adquisicion!.Tecnico.Proveedor.Equipos
+            .Select(e => new SelectListItem
+            {
+                Value = e.Id.ToString(),
+                Text = e.Nombre
+            })
+            .ToList();
+    }
 }
