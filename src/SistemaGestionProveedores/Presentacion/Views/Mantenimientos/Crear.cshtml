@@ -38,8 +38,19 @@
 
         <div class="col-md-4">
             <label asp-for="AdquisicionId" class="form-label">Número de Serie</label>
-            <input asp-for="NumeroSerie" class="form-control" placeholder="Ingrese número de serie" required />
+            <input asp-for="NumeroSerie" id="numeroSerie" class="form-control" placeholder="Ingrese número de serie" required />
             <span asp-validation-for="NumeroSerie" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label for="nombreEquipo" class="form-label">Equipo</label>
+            <input type="text" id="nombreEquipo" class="form-control" readonly placeholder="Nombre del Equipo" />
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="button" id="btnBuscarEquipo" class="btn btn-outline-primary w-100">
+                <i class="bi bi-search"></i> Buscar Equipo
+            </button>
         </div>
 
         <div class="col-md-4">
@@ -112,6 +123,29 @@
                 }
             } catch {
                 alert("Error al buscar el técnico. Intente nuevamente.");
+            }
+        });
+
+        document.getElementById('btnBuscarEquipo').addEventListener('click', async function () {
+            const numeroSerie = document.getElementById('numeroSerie').value.trim();
+
+            if (!numeroSerie) {
+                alert("Por favor ingrese un número de serie.");
+                return;
+            }
+
+            try {
+                // Llamada a endpoint del backend que busca el equipo por su número de serie
+                const response = await fetch(`/Adquisiciones/ConsultarJson?numeroSerie=${numeroSerie}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('nombreEquipo').value = data.adquisicion.equipo;
+                } else {
+                    document.getElementById('nombreEquipo').value = "";
+                    alert("No se encontró ningún equipo con ese número de serie.");
+                }
+            } catch {
+                alert("Error al buscar el equipo. Intente nuevamente.");
             }
         });
 
