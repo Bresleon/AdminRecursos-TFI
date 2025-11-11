@@ -21,6 +21,8 @@ builder.Services.AddScoped<IEquipoRepositorio, EquipoRepositorio>();
 builder.Services.AddScoped<IEquipoServicio, EquipoServicio>();
 builder.Services.AddScoped<ITipoEquipoRepositorio, TipoEquipoRepositorio>();
 builder.Services.AddScoped<ITipoEquipoServicio, TipoEquipoServicio>();
+builder.Services.AddScoped<IAdquisicionRepositorio, AdquisicionRepositorio>();
+builder.Services.AddScoped<IAdquisicionServicio, AdquisicionServicio>();
 
 builder.Services.AddControllersWithViews();
 

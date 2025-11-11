@@ -1,29 +1,33 @@
-﻿using Dominio.Entidades;
-using Infraestructura.Datos;
+﻿using Aplicacion.Interfaces.Servicios;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using Presentacion.Models.Adquisiciones;
 
 namespace Presentacion.Controllers;
 
 public class AdquisicionesController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    //private readonly ApplicationDbContext _context;
+    private readonly IAdquisicionServicio _servicio;
 
-    public AdquisicionesController(ApplicationDbContext context)
+    //public AdquisicionesController(ApplicationDbContext context)
+    //{
+    //    _context = context;
+    //}
+    public AdquisicionesController(IAdquisicionServicio servicio)
     {
-        _context = context;
+        _servicio = servicio;
     }
 
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        var adquisiciones = _context.Adquisiciones
-            .Include(a => a.Tecnico)
-            .Include(a => a.Equipo)
-                .ThenInclude(e => e.TipoEquipo)
-            .ToList()
-            .OrderByDescending(a => a.FechaAdquisicion);
+        //var adquisiciones = _context.Adquisiciones
+        //    .Include(a => a.Tecnico)
+        //    .Include(a => a.Equipo)
+        //        .ThenInclude(e => e.TipoEquipo)
+        //    .ToList()
+        //    .OrderByDescending(a => a.FechaAdquisicion);
+        var adquisiciones = await _servicio.ObtenerTodos();
 
         var adquisicionesVM = adquisiciones.Select(a => new AdquisicionViewModel
         {
@@ -53,7 +57,8 @@ public class AdquisicionesController : Controller
 
     public async Task<IActionResult> Editar(Guid id)
     {
-        var adquisicion = await ObtenerAdquisicion(id);
+        //var adquisicion = await ObtenerAdquisicion(id);
+        var adquisicion = await _servicio.Obtener(id);
 
         var adquisicionEditVM = new AdquisicionUpsertViewModel
         {
@@ -81,7 +86,8 @@ public class AdquisicionesController : Controller
     [HttpPost]
     public async Task<IActionResult> Consultar(string numeroSerie)
     {
-        var adquisicion = await ObtenerAdquisicion(numeroSerie);
+        //var adquisicion = await ObtenerAdquisicion(numeroSerie);
+        var adquisicion = await _servicio.Obtener(numeroSerie);
 
         if (adquisicion == null)
         {
@@ -104,23 +110,23 @@ public class AdquisicionesController : Controller
         return View(adquisicionVM);
     }
 
-    private async Task<Adquisicion?> ObtenerAdquisicion(Guid id)
-    {
-        return await _context.Adquisiciones
-            .Include(a => a.Tecnico)
-                .ThenInclude(t => t.Proveedor)
-                    .ThenInclude(p => p.Equipos)
-            .Include(a => a.Equipo)
-                .ThenInclude(e => e.TipoEquipo)
-            .FirstOrDefaultAsync(a => a.Id == id);
-    }
+    //private async Task<Adquisicion?> ObtenerAdquisicion(Guid id)
+    //{
+    //    return await _context.Adquisiciones
+    //        .Include(a => a.Tecnico)
+    //            .ThenInclude(t => t.Proveedor)
+    //                .ThenInclude(p => p.Equipos)
+    //        .Include(a => a.Equipo)
+    //            .ThenInclude(e => e.TipoEquipo)
+    //        .FirstOrDefaultAsync(a => a.Id == id);
+    //}
 
-    private async Task<Adquisicion?> ObtenerAdquisicion(string numeroSerie)
-    {
-        return await _context.Adquisiciones
-            .Include(a => a.Tecnico)
-            .Include(a => a.Equipo)
-                .ThenInclude(e => e.TipoEquipo)
-            .FirstOrDefaultAsync(a => a.NumeroSerie == numeroSerie);
-    }
+    //private async Task<Adquisicion?> ObtenerAdquisicion(string numeroSerie)
+    //{
+    //    return await _context.Adquisiciones
+    //        .Include(a => a.Tecnico)
+    //        .Include(a => a.Equipo)
+    //            .ThenInclude(e => e.TipoEquipo)
+    //        .FirstOrDefaultAsync(a => a.NumeroSerie == numeroSerie);
+    //}
 }
