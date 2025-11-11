@@ -1,4 +1,5 @@
 ﻿using Aplicacion.Interfaces.Servicios;
+using Dominio.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Presentacion.Models.Proveedores;
 using System.Threading.Tasks;
@@ -48,6 +49,37 @@ public class ProveedoresController : Controller
     public IActionResult Crear()
     {
         return View();
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Crear(ProveedorViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            return View(modelo);
+        }
+
+        var proveedor = new Proveedor
+        {
+            RazonSocial = modelo.RazonSocial,
+            CUIT = modelo.CUIT,
+            Email = modelo.Email,
+            Direccion = modelo.Direccion,
+            Telefono = modelo.Telefono,
+        };
+
+        try
+        {
+            await _proveedorServ.Agregar(proveedor);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Editar(Guid id)
