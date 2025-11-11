@@ -22,14 +22,6 @@ public class AdquisicionServicio : IAdquisicionServicio
             throw new Exception("No se pudo agregar la adquisicion");
     }
 
-    public async Task Eliminar(Adquisicion adquisicion)
-    {
-        var esExitosa = await _repo.Eliminar(adquisicion);
-
-        if (!esExitosa)
-            throw new Exception("No se pudo eliminar la adquisicion");
-    }
-
     public async Task Modificar(Adquisicion adquisicion)
     {
         var esExitosa = await _repo.Modificar(adquisicion);
