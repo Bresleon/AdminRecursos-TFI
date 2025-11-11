@@ -185,6 +185,24 @@ public class ProveedoresController : Controller
         return View(proveedorVM);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Eliminar(ProveedorViewModel modelo)
+    {
+        var proveedor = new Proveedor { Id = modelo.Id };
+
+        try
+        {
+            await _proveedorServ.Eliminar(proveedor);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     private async Task<decimal> CalcularMontoTotalPagado(Guid proveedorId)
     {
         var montoTotalAdquisiciones = (await _adquisicionServ.ObtenerTodos(a => a.Tecnico.ProveedorId == proveedorId)).Sum(a => a.Costo);
