@@ -1,6 +1,8 @@
 ﻿using Aplicacion.Interfaces.Servicios;
+using Dominio.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Presentacion.Models.Proveedores;
 using Presentacion.Models.Tecnicos;
 
 namespace Presentacion.Controllers;
@@ -57,6 +59,37 @@ public class TecnicosController : Controller
         return View(tecnicoVM);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Crear(TecnicoViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            return View(modelo);
+        }
+
+        var tecnico = new Tecnico
+        {
+            ProveedorId = modelo.ProveedorId,
+            Nombre = modelo.Nombre,
+            Apellido = modelo.Apellido,
+            DNI = modelo.DNI,
+            Telefono = modelo.Telefono,
+        };
+
+        try
+        {
+            await _tecnicoServ.Agregar(tecnico);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     public async Task<IActionResult> Detalles(Guid id)
     {
         var tecnico = await _tecnicoServ.Obtener(id);
@@ -100,11 +133,45 @@ public class TecnicosController : Controller
             Apellido = tecnico.Apellido,
             DNI = tecnico.DNI,
             Telefono = tecnico.Telefono,
+            Calificacion = tecnico.Calificacion,
             ProveedorId = tecnico.Proveedor.Id,
             ProveedoresDisponibles = proveedoresSelect
         };
 
         return View(tecnicoVM);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Editar(TecnicoViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            return View(modelo);
+        }
+
+        var tecnico = new Tecnico
+        {
+            Id = modelo.Id,
+            ProveedorId = modelo.ProveedorId,
+            Nombre = modelo.Nombre,
+            Apellido = modelo.Apellido,
+            DNI = modelo.DNI,
+            Telefono = modelo.Telefono,
+            Calificacion = modelo.Calificacion,
+        };
+
+        try
+        {
+            await _tecnicoServ.Modificar(tecnico);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Eliminar(Guid id)
@@ -121,10 +188,29 @@ public class TecnicosController : Controller
             Apellido = tecnico.Apellido,
             DNI = tecnico.DNI,
             Telefono = tecnico.Telefono,
+            Calificacion = tecnico.Calificacion,
             ProveedorNombre = tecnico.Proveedor.RazonSocial
         };
 
         return View(tecnicoVM);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Eliminar(TecnicoViewModel modelo)
+    {
+        var tecnico = new Tecnico { Id = modelo.Id };
+
+        try
+        {
+            await _tecnicoServ.Eliminar(tecnico);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     #region AJAX_CALLS
