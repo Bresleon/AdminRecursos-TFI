@@ -7,7 +7,7 @@
 
 <h2>@ViewData["Title"]</h2>
 
-<form asp-action="Create" method="post" id="adquisicionForm" class="card p-4 shadow-sm">
+<form asp-action="Crear" method="post" id="adquisicionForm" class="card p-4 shadow-sm">
     <div class="mb-3">
         <label class="form-label">DNI del Técnico</label>
         <div class="input-group">
@@ -75,7 +75,7 @@
                 return;
             }
 
-            fetch(`/Adquisiciones/BuscarTecnicoPorDni?dni=${dni}`)
+            fetch(`/Tecnicos/BuscarTecnicoPorDni?dni=${dni}`)
                 .then(res => {
                     if (!res.ok) throw new Error("Error en la búsqueda");
                     return res.json();
