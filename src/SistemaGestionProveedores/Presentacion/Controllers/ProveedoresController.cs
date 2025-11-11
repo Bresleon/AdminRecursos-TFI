@@ -1,30 +1,36 @@
 ﻿using Aplicacion.Interfaces.Servicios;
+using Dominio.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Presentacion.Models.Proveedores;
+using System.Threading.Tasks;
 
 namespace Presentacion.Controllers;
 
 public class ProveedoresController : Controller
 {
-    private readonly IProveedorServicio _servicio;
+    private readonly IProveedorServicio _proveedorServ;
+    private readonly IAdquisicionServicio _adquisicionServ;
+    private readonly IMantenimientoServicio _mantenimientoServ;
 
-    public ProveedoresController(IProveedorServicio servicio)
+    public ProveedoresController(IProveedorServicio proveedorServ, IAdquisicionServicio adquisicionServ, IMantenimientoServicio mantenimientoServ)
     {
-        _servicio = servicio;
+        _proveedorServ = proveedorServ;
+        _adquisicionServ = adquisicionServ;
+        _mantenimientoServ = mantenimientoServ;
     }
 
     public async Task<IActionResult> Index(string sortOrder)
     {
         ViewData["SortOrder"] = sortOrder ?? "";
 
-        var proveedores = await _servicio.ObtenerTodos();
+        var proveedores = await _proveedorServ.ObtenerTodos();
 
         var proveedoresVM = proveedores.Select(p => new ProveedorViewModel
         {
             Id = p.Id,
             RazonSocial = p.RazonSocial,
             CUIT = p.CUIT,
-            //MontoTotalPagado = CalcularMontoTotalPagado(p.Id),
+            MontoTotalPagado = CalcularMontoTotalPagado(p.Id).Result,
             Calificacion = p.Calificacion
         }).ToList();
 
@@ -45,9 +51,40 @@ public class ProveedoresController : Controller
         return View();
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Crear(ProveedorViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            return View(modelo);
+        }
+
+        var proveedor = new Proveedor
+        {
+            RazonSocial = modelo.RazonSocial,
+            CUIT = modelo.CUIT,
+            Email = modelo.Email,
+            Direccion = modelo.Direccion,
+            Telefono = modelo.Telefono,
+        };
+
+        try
+        {
+            await _proveedorServ.Agregar(proveedor);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     public async Task<IActionResult> Editar(Guid id)
     {
-        var proveedor = await _servicio.Obtener(id);
+        var proveedor = await _proveedorServ.Obtener(id);
 
         if (proveedor == null)
         {
@@ -69,7 +106,7 @@ public class ProveedoresController : Controller
 
     public async Task<IActionResult> Detalles(Guid id)
     {
-        var proveedor = await _servicio.Obtener(id);
+        var proveedor = await _proveedorServ.Obtener(id);
 
         if (proveedor == null)
         {
@@ -85,7 +122,7 @@ public class ProveedoresController : Controller
             Direccion = proveedor.Direccion,
             Telefono = proveedor.Telefono,
             Calificacion = proveedor.Calificacion,
-            //MontoTotalPagado = CalcularMontoTotalPagado(proveedor.Id)
+            MontoTotalPagado = CalcularMontoTotalPagado(proveedor.Id).Result
         };
 
         return View(proveedorVM);
@@ -93,7 +130,7 @@ public class ProveedoresController : Controller
 
     public async Task<IActionResult> Eliminar(Guid id)
     {
-        var proveedor = await _servicio.Obtener(id);
+        var proveedor = await _proveedorServ.Obtener(id);
 
         if (proveedor == null)
         {
@@ -108,26 +145,17 @@ public class ProveedoresController : Controller
             Email = proveedor.Email,
             Direccion = proveedor.Direccion,
             Telefono = proveedor.Telefono,
+            Calificacion = proveedor.Calificacion
         };
 
         return View(proveedorVM);
     }
 
-    // TODO: Incluir uso de AdquisicionServicio y MantenimientoServicio
-    //private decimal CalcularMontoTotalPagado(Guid proveedorId)
-    //{
-    //    var montoTotalAdquisiciones = _context.Adquisiciones
-    //        .Include(a => a.Tecnico)
-    //            .ThenInclude(t => t.Proveedor)
-    //        .Where(a => a.Tecnico.ProveedorId == proveedorId)
-    //        .Sum(a => a.Costo);
+    private async Task<decimal> CalcularMontoTotalPagado(Guid proveedorId)
+    {
+        var montoTotalAdquisiciones = (await _adquisicionServ.ObtenerTodos(a => a.Tecnico.ProveedorId == proveedorId)).Sum(a => a.Costo);
+        var montoTotalMantenimientos = (await _mantenimientoServ.ObtenerTodos(m => m.Tecnico.ProveedorId == proveedorId)).Sum(m => m.Costo);
 
-    //    var montoTotalMantenimientos = _context.Mantenimientos
-    //        .Include(m => m.Tecnico)
-    //            .ThenInclude(t => t.Proveedor)
-    //        .Where(m => m.Tecnico.ProveedorId == proveedorId)
-    //        .Sum(m => m.Costo);
-
-    //    return montoTotalAdquisiciones + montoTotalMantenimientos;
-    //}
+        return montoTotalAdquisiciones + montoTotalMantenimientos;
+    }
 }
