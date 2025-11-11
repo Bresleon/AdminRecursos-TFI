@@ -1,7 +1,9 @@
 ﻿using Aplicacion.Interfaces.Servicios;
+using Dominio.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Presentacion.Models.Equipos;
+using Presentacion.Models.Tecnicos;
 
 namespace Presentacion.Controllers;
 
@@ -58,6 +60,35 @@ public class EquiposController : Controller
         return View(equipoVM);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Crear(EquipoViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            return View(modelo);
+        }
+
+        var equipo = new Equipo
+        {
+            Nombre = modelo.Nombre,
+            TipoEquipoId = modelo.TipoEquipoId,
+            ProveedorId = modelo.ProveedorId,
+        };
+
+        try
+        {
+            await _equipoServ.Agregar(equipo);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     public async Task<IActionResult> Editar(Guid id)
     {
         var equipo = await _equipoServ.Obtener(id);
@@ -93,6 +124,36 @@ public class EquiposController : Controller
         return View(equipoVM);
     }
 
+    [HttpPost]
+    public async Task<IActionResult> Editar(EquipoViewModel modelo)
+    {
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            return View(modelo);
+        }
+
+        var equipo = new Equipo
+        {
+            Id = modelo.Id,
+            Nombre = modelo.Nombre,
+            TipoEquipoId = modelo.TipoEquipoId,
+            ProveedorId = modelo.ProveedorId,
+        };
+
+        try
+        {
+            await _equipoServ.Modificar(equipo);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
     public async Task<IActionResult> Eliminar(Guid id)
     {
         var equipo = await _equipoServ.Obtener(id);
@@ -111,5 +172,23 @@ public class EquiposController : Controller
         };
 
         return View(equipoVM);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Eliminar(EquipoViewModel modelo)
+    {
+        var equipo = new Equipo { Id = modelo.Id };
+
+        try
+        {
+            await _equipoServ.Eliminar(equipo);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 }
