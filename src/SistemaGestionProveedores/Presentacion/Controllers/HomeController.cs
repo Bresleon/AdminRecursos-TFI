@@ -1,3 +1,4 @@
+using Aplicacion.Interfaces.Servicios;
 using Infraestructura.Datos;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -5,16 +6,27 @@ using Presentacion.Models.Home;
 
 public class HomeController : Controller
 {
-    private readonly ApplicationDbContext _context;
+    //private readonly ApplicationDbContext _context;
+    private readonly IProveedorServicio _proveedorServ;
+    private readonly IAdquisicionServicio _adquisicionServ;
+    private readonly IMantenimientoServicio _mantenimientoServ;
 
-    public HomeController(ApplicationDbContext context)
+    public HomeController(IProveedorServicio proveedorServ, 
+                          IAdquisicionServicio adquisicionServ, 
+                          IMantenimientoServicio mantenimientoServ)
     {
-        _context = context;
+        _proveedorServ = proveedorServ;
+        _adquisicionServ = adquisicionServ;
+        _mantenimientoServ = mantenimientoServ;
     }
 
     public async Task<IActionResult> Index()
     {
-        var mejoresProveedores = await _context.Proveedores
+        var proveedores = await _proveedorServ.ObtenerTodos();
+        var adquisiciones = await _adquisicionServ.ObtenerTodos();
+        var mantenimientos = await _mantenimientoServ.ObtenerTodos();
+
+        var mejoresProveedores = proveedores
             .OrderByDescending(p => p.Calificacion)
             .Take(5)
             .Select(p => new ProveedorRankingViewModel
@@ -22,9 +34,9 @@ public class HomeController : Controller
                 RazonSocial = p.RazonSocial,
                 Calificacion = p.Calificacion
             })
-            .ToListAsync();
+            .ToList();
 
-        var proveedoresConMasIngresos = await _context.Proveedores
+        var proveedoresConMasIngresos = proveedores
             .Select(p => new ProveedorIngresosViewModel
             {
                 RazonSocial = p.RazonSocial,
@@ -34,17 +46,14 @@ public class HomeController : Controller
             })
             .OrderByDescending(p => p.TotalPagado)
             .Take(5)
-            .ToListAsync();
+            .ToList();
 
-        var totalProveedores = await _context.Proveedores.CountAsync();
-        var totalAdquisiciones = await _context.Adquisiciones.CountAsync();
-        var totalMantenimientos = await _context.Mantenimientos.CountAsync();
-        var montoTotalInvertido = await _context.Adquisiciones.SumAsync(a => a.Costo)
-            + await _context.Mantenimientos.SumAsync(m => m.Costo);
+        var totalProveedores = proveedores.Count();
+        var totalAdquisiciones = adquisiciones.Count();
+        var totalMantenimientos = mantenimientos.Count();
+        var montoTotalInvertido = adquisiciones.Sum(a => a.Costo) + mantenimientos.Sum(m => m.Costo);
 
-        var ultimasAdquisiciones = await _context.Adquisiciones
-            .Include(a => a.Equipo).ThenInclude(e => e.Proveedor)
-            .Include(a => a.Tecnico)
+        var ultimasAdquisiciones = adquisiciones
             .OrderByDescending(a => a.FechaAdquisicion)
             .Take(5)
             .Select(a => new AdquisicionRecienteViewModel
@@ -56,12 +65,9 @@ public class HomeController : Controller
                 FechaAdquisicion = a.FechaAdquisicion,
                 Costo = a.Costo
             })
-            .ToListAsync();
+            .ToList();
 
-        var ultimosMantenimientos = await _context.Mantenimientos
-            .Include(m => m.Adquisicion).ThenInclude(a => a.Equipo)
-            .Include(m => m.Tecnico)
-            .Include(m => m.TipoMantenimiento)
+        var ultimosMantenimientos = mantenimientos
             .OrderByDescending(m => m.Fecha)
             .Take(5)
             .Select(m => new MantenimientoRecienteViewModel
@@ -73,7 +79,7 @@ public class HomeController : Controller
                 Costo = m.Costo,
                 Estado = m.Estado.ToString()
             })
-            .ToListAsync();
+            .ToList();
 
         var viewModel = new DashboardViewModel
         {
