@@ -12,6 +12,7 @@ public class MantenimientoUpsertViewModel
 
     // Solo lectura o informativos
     public string NumeroSerie { get; set; } = string.Empty;
+    public string DniTecnico { get; set; } = string.Empty; 
     public string Equipo { get; set; } = string.Empty;
     public string TipoEquipo { get; set; } = string.Empty;
 
@@ -22,7 +23,6 @@ public class MantenimientoUpsertViewModel
     public float Calificacion { get; set; }
 
     // Para desplegables
-    public List<SelectListItem> TecnicosDisponibles { get; set; } = new();
     public List<SelectListItem> TiposMantenimientoDisponibles { get; set; } = new();
     public List<SelectListItem> EstadosDisponibles { get; set; } = new();
 }

@@ -7,7 +7,7 @@
 
 <h2 class="mb-4 text-center">Editar Mantenimiento</h2>
 
-<form asp-action="Edit" method="post" class="card shadow-lg border-0 p-4">
+<form asp-action="Editar" method="post" class="card shadow-lg border-0 p-4">
     <input type="hidden" asp-for="Id" />
 
     <div class="row g-3">
@@ -26,10 +26,10 @@
             <input class="form-control" value="@Model.TipoEquipo" readonly />
         </div>
 
-        <div class="col-md-4">
+        @* <div class="col-md-4">
             <label asp-for="TecnicoId" class="form-label">Técnico Responsable</label>
             <select asp-for="TecnicoId" class="form-select" asp-items="Model.TecnicosDisponibles"></select>
-        </div>
+        </div> *@
 
         <div class="col-md-4">
             <label asp-for="TipoMantenimientoId" class="form-label">Tipo de Mantenimiento</label>
