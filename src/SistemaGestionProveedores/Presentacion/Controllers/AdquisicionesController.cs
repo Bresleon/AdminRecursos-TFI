@@ -3,8 +3,6 @@ using Dominio.Entidades;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Presentacion.Models.Adquisiciones;
-using Presentacion.Models.Tecnicos;
-using System.Threading.Tasks;
 
 namespace Presentacion.Controllers;
 
@@ -185,4 +183,24 @@ public class AdquisicionesController : Controller
             })
             .ToList();
     }
+
+    #region AJAX_CALLS
+    [HttpGet]
+    public async Task<IActionResult> ConsultarJson(string numeroSerie)
+    {
+        var adquisicion = await _servicio.Obtener(numeroSerie);
+
+        if (adquisicion == null)
+            return Json(null);
+
+        return Json(new
+        {
+            adquisicion = new
+            {
+                id = adquisicion.Id,
+                equipo = adquisicion.Equipo.Nombre,
+            }
+        });
+    }
+    #endregion
 }

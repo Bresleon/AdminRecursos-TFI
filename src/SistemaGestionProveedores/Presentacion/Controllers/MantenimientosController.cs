@@ -1,4 +1,5 @@
 ﻿using Aplicacion.Interfaces.Servicios;
+using Dominio.Entidades;
 using Dominio.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -9,12 +10,17 @@ namespace Presentacion.Controllers;
 public class MantenimientosController : Controller
 {
     private readonly IMantenimientoServicio _mantenimientoServ;
+    private readonly IAdquisicionServicio _adquisicionServ;
     private readonly ITecnicoServicio _tecnicoServ;
     private readonly ITipoMantenimientoServicio _tipoMantenimientoServ;
 
-    public MantenimientosController(IMantenimientoServicio mantenimientoServ, ITecnicoServicio tecnicoServ, ITipoMantenimientoServicio tipoMantenimientoServ)
+    public MantenimientosController(IMantenimientoServicio mantenimientoServ, 
+                                    IAdquisicionServicio adquisicionServ, 
+                                    ITecnicoServicio tecnicoServ, 
+                                    ITipoMantenimientoServicio tipoMantenimientoServ)
     {
         _mantenimientoServ = mantenimientoServ;
+        _adquisicionServ = adquisicionServ;
         _tecnicoServ = tecnicoServ;
         _tipoMantenimientoServ = tipoMantenimientoServ;
     }
@@ -44,16 +50,74 @@ public class MantenimientosController : Controller
 
     public async Task<IActionResult> Crear()
     {
-        var (tecnicos, tiposMantenimiento, estados) = await ObtenerListasDesplegablesMantenimiento();
+        var (tiposMantenimiento, estados) = await ObtenerListasDesplegablesMantenimiento();
 
         var mantenimientoVM = new MantenimientoUpsertViewModel
         {
-            TecnicosDisponibles = tecnicos,
             TiposMantenimientoDisponibles = tiposMantenimiento,
             EstadosDisponibles = estados
         };
 
         return View(mantenimientoVM);
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Crear(MantenimientoUpsertViewModel modelo)
+    {
+        var (tiposMantenimiento, estados) = await ObtenerListasDesplegablesMantenimiento();
+        modelo.TiposMantenimientoDisponibles = tiposMantenimiento;
+        modelo.EstadosDisponibles = estados;
+
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            return View(modelo);
+        }
+
+        var tecnico = await _tecnicoServ.Obtener(modelo.DniTecnico);
+        var adquisicion = await _adquisicionServ.Obtener(modelo.NumeroSerie);
+
+        if (tecnico == null)
+        {
+            ModelState.AddModelError("DniTecnico", "El DNI del técnico no existe");
+            return View(modelo);
+        }
+
+        if (adquisicion == null)
+        {
+            ModelState.AddModelError("NumeroSerie", "El número de serie del equipo no existe");
+            return View(modelo);
+        }
+
+        if (tecnico.ProveedorId != adquisicion.Tecnico.ProveedorId)
+        {
+            ModelState.AddModelError("", "El técnico que realice el mantenimiento debe pertenecer a la misma empresa de quien vendió el equipo");
+            return View(modelo);
+        }
+
+        var mantenimiento = new Mantenimiento
+        {
+            AdquisicionId = modelo.AdquisicionId,
+            TecnicoId = modelo.TecnicoId,
+            TipoMantenimientoId = modelo.TipoMantenimientoId,
+            Estado = modelo.Estado,
+            Fecha = modelo.Fecha,
+            Descripcion = modelo.Descripcion,
+            Costo = modelo.Costo,
+            Calificacion = modelo.Calificacion,
+        };
+
+        try
+        {
+            await _mantenimientoServ.Agregar(mantenimiento);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
     }
 
     public async Task<IActionResult> Detalles(Guid id)
@@ -83,7 +147,7 @@ public class MantenimientosController : Controller
     {
         var mantenimiento = await _mantenimientoServ.Obtener(id);
 
-        var (tecnicos, tiposMantenimiento, estados) = await ObtenerListasDesplegablesMantenimiento();
+        var (tiposMantenimiento, estados) = await ObtenerListasDesplegablesMantenimiento();
 
         var mantenimientoVM = new MantenimientoUpsertViewModel
         {
@@ -91,6 +155,8 @@ public class MantenimientosController : Controller
             AdquisicionId = mantenimiento!.AdquisicionId,
             TecnicoId = mantenimiento.TecnicoId,
             TipoMantenimientoId = mantenimiento.TipoMantenimientoId,
+            DniTecnico = mantenimiento.Tecnico.DNI,
+            NombreCompletoTecnico = mantenimiento.Tecnico.Nombre + " " + mantenimiento.Tecnico.Apellido,
             NumeroSerie = mantenimiento.Adquisicion.NumeroSerie,
             Equipo = mantenimiento.Adquisicion.Equipo.Nombre,
             TipoEquipo = mantenimiento.Adquisicion.Equipo.TipoEquipo.Nombre,
@@ -99,7 +165,6 @@ public class MantenimientosController : Controller
             Descripcion = mantenimiento.Descripcion,
             Costo = mantenimiento.Costo,
             Calificacion = mantenimiento.Calificacion,
-            TecnicosDisponibles = tecnicos,
             TiposMantenimientoDisponibles = tiposMantenimiento,
             EstadosDisponibles = estados
         };
@@ -107,16 +172,68 @@ public class MantenimientosController : Controller
         return View(mantenimientoVM);
     }
 
-    private async Task<(List<SelectListItem>, List<SelectListItem>, List<SelectListItem>)> ObtenerListasDesplegablesMantenimiento()
+    [HttpPost]
+    public async Task<IActionResult> Editar(MantenimientoUpsertViewModel modelo)
     {
-        // TODO: Debería buscar solo técnicos que trabajen en la misma empresa que el técnico que vendió el equipo
-        var tecnicos = await _tecnicoServ.ObtenerTodos();
-        var tecnicosSelect = tecnicos.Select(t => new SelectListItem
-            {
-                Value = t.Id.ToString(),
-                Text = $"{t.Nombre} {t.Apellido} - DNI: {t.DNI}"
-            }).ToList();
+        var (tiposMantenimiento, estados) = await ObtenerListasDesplegablesMantenimiento();
+        modelo.TiposMantenimientoDisponibles = tiposMantenimiento;
+        modelo.EstadosDisponibles = estados;
 
+        if (!ModelState.IsValid)
+        {
+            ModelState.AddModelError("", "Uno o varios de los datos son incorrectos o están vacíos");
+            return View(modelo);
+        }
+
+        var tecnico = await _tecnicoServ.Obtener(modelo.DniTecnico);
+        var adquisicion = await _adquisicionServ.Obtener(modelo.NumeroSerie);
+
+        if (tecnico == null)
+        {
+            ModelState.AddModelError("DniTecnico", "El DNI del técnico no existe");
+            return View(modelo);
+        }
+
+        if (adquisicion == null)
+        {
+            ModelState.AddModelError("NumeroSerie", "El número de serie del equipo no existe");
+            return View(modelo);
+        }
+
+        if (tecnico.ProveedorId != adquisicion.Tecnico.ProveedorId)
+        {
+            ModelState.AddModelError("", "El técnico que realice el mantenimiento debe pertenecer a la misma empresa de quien vendió el equipo");
+            return View(modelo);
+        }
+
+        var mantenimiento = new Mantenimiento
+        {
+            Id = modelo.Id,
+            AdquisicionId = modelo.AdquisicionId,
+            TecnicoId = modelo.TecnicoId,
+            TipoMantenimientoId = modelo.TipoMantenimientoId,
+            Estado = modelo.Estado,
+            Fecha = modelo.Fecha,
+            Descripcion = modelo.Descripcion,
+            Costo = modelo.Costo,
+            Calificacion = modelo.Calificacion,
+        };
+
+        try
+        {
+            await _mantenimientoServ.Modificar(mantenimiento);
+        }
+        catch (Exception e)
+        {
+            ModelState.AddModelError("", e.Message);
+            return View(modelo);
+        }
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    private async Task<(List<SelectListItem>, List<SelectListItem>)> ObtenerListasDesplegablesMantenimiento()
+    {
         var tiposMantenimiento = await _tipoMantenimientoServ.ObtenerTodos();
         var tiposMantenimientoSelect = tiposMantenimiento
             .Select(tm => new SelectListItem
@@ -131,6 +248,6 @@ public class MantenimientosController : Controller
             new SelectListItem { Value = Estado.FINALIZADO.ToString(), Text = "Finalizado" }
         };
 
-        return (tecnicosSelect, tiposMantenimientoSelect, estados);
+        return (tiposMantenimientoSelect, estados);
     }
 }
