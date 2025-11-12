@@ -12,7 +12,8 @@ public class MantenimientoUpsertViewModel
 
     // Solo lectura o informativos
     public string NumeroSerie { get; set; } = string.Empty;
-    public string DniTecnico { get; set; } = string.Empty; 
+    public string DniTecnico { get; set; } = string.Empty;
+    public string NombreCompletoTecnico { get; set; } = string.Empty;
     public string Equipo { get; set; } = string.Empty;
     public string TipoEquipo { get; set; } = string.Empty;
 
