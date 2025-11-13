@@ -1,4 +1,5 @@
-﻿using Dominio.Entidades;
+﻿using Aplicacion.Servicios.Seguridad;
+using Dominio.Entidades;
 using Dominio.Enums;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,6 +9,7 @@ public class Iniciales
 {
     private static Iniciales? _instance = null;
     private static readonly object _lock = new();
+    private static PasswordService _passwordService = new();
 
     private Iniciales()
     {
@@ -37,6 +39,7 @@ public class Iniciales
     public List<Adquisicion> Adquisiciones { get; private set; } = new();
     public List<TipoMantenimiento> TiposMantenimiento { get; private set; } = new();
     public List<Mantenimiento> Mantenimientos { get; private set; } = new();
+    public List<Usuario> Usuarios { get; private set; } = new();
 
     private void Inicializar()
     {
@@ -47,6 +50,7 @@ public class Iniciales
         InicializarAdquisiciones();
         InicializarTiposMantenimiento();
         InicializarMantenimientos();
+        InicializarUsuarios();
     }
 
     private void InicializarProveedores()
@@ -221,7 +225,7 @@ public class Iniciales
         ]);
     }
 
-    public void InicializarTiposMantenimiento()
+    private void InicializarTiposMantenimiento()
     {
         TiposMantenimiento.AddRange(
         [
@@ -248,7 +252,7 @@ public class Iniciales
         ]);
     }
 
-    public void InicializarMantenimientos()
+    private void InicializarMantenimientos()
     {
         Mantenimientos.AddRange(
         [
@@ -275,6 +279,27 @@ public class Iniciales
                 Costo = 15000,
                 Descripcion = "Actualización del firmware del router para mejorar la seguridad.",
                 Calificacion = 4.0f
+            }
+        ]);
+    }
+
+    private void InicializarUsuarios()
+    {
+        Usuarios.AddRange(
+        [
+            new Usuario
+            {
+                Id = Guid.Parse("C673BA2A-7F3C-4F76-B9FD-DA3121EFEF2C"),
+                NombreUsuario = "admin",
+                Contrasena = _passwordService.Hashear("1234"),
+                Rol = "Ejecutivo"
+            },
+            new Usuario
+            {
+                Id = Guid.Parse("2BE48BC4-A874-44A4-B5C5-CC94124558A9"),
+                NombreUsuario = "empleado",
+                Contrasena = _passwordService.Hashear("1234"),
+                Rol = "Empleado"
             }
         ]);
     }

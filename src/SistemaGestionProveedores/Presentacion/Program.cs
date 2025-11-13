@@ -3,6 +3,7 @@ using Aplicacion.Interfaces.Servicios;
 using Aplicacion.Servicios;
 using Infraestructura.Datos;
 using Infraestructura.Repositorios;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -30,7 +31,24 @@ builder.Services.AddScoped<ITipoMantenimientoServicio, TipoMantenimientoServicio
 
 builder.Services.AddControllersWithViews();
 
+// Configuración para autenticación
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Auth/Login";
+        options.LogoutPath = "/Auth/Logout";
+        options.AccessDeniedPath = "/Auth/AccessDenied";
+    });
+
 var app = builder.Build();
+
+// Insertar usuarios al iniciar la app
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+    context.Database.Migrate();
+    DataSeeder.Seed(context);
+}
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
@@ -45,6 +63,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
