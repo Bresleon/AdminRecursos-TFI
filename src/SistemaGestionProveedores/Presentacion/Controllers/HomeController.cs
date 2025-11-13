@@ -1,12 +1,11 @@
 using Aplicacion.Interfaces.Servicios;
-using Infraestructura.Datos;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Presentacion.Models.Home;
 
+[Authorize]
 public class HomeController : Controller
 {
-    //private readonly ApplicationDbContext _context;
     private readonly IProveedorServicio _proveedorServ;
     private readonly IAdquisicionServicio _adquisicionServ;
     private readonly IMantenimientoServicio _mantenimientoServ;

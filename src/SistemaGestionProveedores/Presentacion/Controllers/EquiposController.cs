@@ -1,12 +1,13 @@
 ﻿using Aplicacion.Interfaces.Servicios;
 using Dominio.Entidades;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Presentacion.Models.Equipos;
-using Presentacion.Models.Tecnicos;
 
 namespace Presentacion.Controllers;
 
+[Authorize(Roles = "Ejecutivo")]
 public class EquiposController : Controller
 {
     private readonly IEquipoServicio _equipoServ;

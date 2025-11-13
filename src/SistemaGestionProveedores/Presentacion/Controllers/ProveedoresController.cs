@@ -1,11 +1,12 @@
 ﻿using Aplicacion.Interfaces.Servicios;
 using Dominio.Entidades;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Presentacion.Models.Proveedores;
-using System.Threading.Tasks;
 
 namespace Presentacion.Controllers;
 
+[Authorize(Roles = "Ejecutivo")]
 public class ProveedoresController : Controller
 {
     private readonly IProveedorServicio _proveedorServ;

@@ -1,12 +1,14 @@
 ﻿using Aplicacion.Interfaces.Servicios;
 using Dominio.Entidades;
 using Dominio.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Presentacion.Models.Mantenimientos;
 
 namespace Presentacion.Controllers;
 
+[Authorize]
 public class MantenimientosController : Controller
 {
     private readonly IMantenimientoServicio _mantenimientoServ;
