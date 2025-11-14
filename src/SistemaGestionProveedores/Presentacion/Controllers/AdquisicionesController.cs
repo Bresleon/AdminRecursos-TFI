@@ -1,11 +1,13 @@
 ﻿using Aplicacion.Interfaces.Servicios;
 using Dominio.Entidades;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Presentacion.Models.Adquisiciones;
 
 namespace Presentacion.Controllers;
 
+[Authorize]
 public class AdquisicionesController : Controller
 {
     private readonly IAdquisicionServicio _servicio;

@@ -1,4 +1,9 @@
-﻿<!DOCTYPE html>
+﻿@using System.Security.Claims
+@{
+    var rol = User.FindFirstValue(ClaimTypes.Role);
+}
+
+<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="utf-8" />
@@ -47,13 +52,29 @@
 
                 <div class="collapse navbar-collapse" id="navbarContent">
                     <ul class="navbar-nav ms-auto">
-                        <li class="nav-item"><a class="nav-link text-white" asp-controller="Home" asp-action="Index">Menú Principal</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" asp-controller="Proveedores" asp-action="Index">Proveedores</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" asp-controller="Tecnicos" asp-action="Index">Técnicos</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" asp-controller="Adquisiciones" asp-action="Index">Adquisiciones</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" asp-controller="Adquisiciones" asp-action="Consultar">Consultar adquisición</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" asp-controller="Mantenimientos" asp-action="Index">Mantenimientos</a></li>
-                        <li class="nav-item"><a class="nav-link text-white" asp-controller="Equipos" asp-action="Index">Equipos</a></li>
+                        @if (rol == "Ejecutivo")
+                        {
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Home" asp-action="Index">Menú Principal</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Proveedores" asp-action="Index">Proveedores</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Tecnicos" asp-action="Index">Técnicos</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Equipos" asp-action="Index">Equipos</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Adquisiciones" asp-action="Index">Adquisiciones</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Adquisiciones" asp-action="Consultar">Consultar adquisición</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Mantenimientos" asp-action="Index">Mantenimientos</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Auth" asp-action="Logout">Cerrar Sesión</a></li>
+                        }
+                        else if (rol == "Empleado")
+                        {
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Home" asp-action="Index">Menú Principal</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Adquisiciones" asp-action="Index">Adquisiciones</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Adquisiciones" asp-action="Consultar">Consultar adquisición</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Mantenimientos" asp-action="Index">Mantenimientos</a></li>
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Auth" asp-action="Logout">Cerrar Sesión</a></li>
+                        }
+                        else
+                        {
+                            <li class="nav-item"><a class="nav-link text-white" asp-controller="Account" asp-action="Register">Crear Cuenta</a></li>
+                        }
                     </ul>
                 </div>
             </div>

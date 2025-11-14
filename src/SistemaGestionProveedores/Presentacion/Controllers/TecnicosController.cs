@@ -1,12 +1,13 @@
 ﻿using Aplicacion.Interfaces.Servicios;
 using Dominio.Entidades;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Presentacion.Models.Proveedores;
 using Presentacion.Models.Tecnicos;
 
 namespace Presentacion.Controllers;
 
+[Authorize(Roles = "Ejecutivo")]
 public class TecnicosController : Controller
 {
     private readonly ITecnicoServicio _tecnicoServ;

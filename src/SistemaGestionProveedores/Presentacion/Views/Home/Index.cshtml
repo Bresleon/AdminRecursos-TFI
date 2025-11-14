@@ -1,176 +1,185 @@
 ﻿@using Presentacion.Models.Home
+@using System.Security.Claims
+@{
+	var rol = User.FindFirstValue(ClaimTypes.Role);
+}
+
 @model DashboardViewModel
 @{
-    ViewData["Title"] = "Panel Principal";
+	ViewData["Title"] = "Panel Principal";
 }
+
 
 <h2 class="text-center mb-4">📊 Panel Principal</h2>
 
 <!-- === Tarjetas de resumen === -->
-<div class="row text-center mb-4">
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm border-primary">
-            <div class="card-body">
-                <h5 class="card-title text-primary">Proveedores</h5>
-                <h3>@Model.TotalProveedores</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm border-success">
-            <div class="card-body">
-                <h5 class="card-title text-success">Adquisiciones</h5>
-                <h3>@Model.TotalAdquisiciones</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm border-warning">
-            <div class="card-body">
-                <h5 class="card-title text-warning">Mantenimientos</h5>
-                <h3>@Model.TotalMantenimientos</h3>
-            </div>
-        </div>
-    </div>
-    <div class="col-md-3 mb-3">
-        <div class="card shadow-sm border-danger">
-            <div class="card-body">
-                <h5 class="card-title text-danger">Monto Total Invertido</h5>
-                <h3>$@Model.MontoTotalInvertido.ToString("N2")</h3>
-            </div>
-        </div>
-    </div>
-</div>
+@if (rol == "Ejecutivo")
+{
+	<div class="row text-center mb-4">
+		<div class="col-md-3 mb-3">
+			<div class="card shadow-sm border-primary">
+				<div class="card-body">
+					<h5 class="card-title text-primary">Proveedores</h5>
+					<h3>@Model.TotalProveedores</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3 mb-3">
+			<div class="card shadow-sm border-success">
+				<div class="card-body">
+					<h5 class="card-title text-success">Adquisiciones</h5>
+					<h3>@Model.TotalAdquisiciones</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3 mb-3">
+			<div class="card shadow-sm border-warning">
+				<div class="card-body">
+					<h5 class="card-title text-warning">Mantenimientos</h5>
+					<h3>@Model.TotalMantenimientos</h3>
+				</div>
+			</div>
+		</div>
+		<div class="col-md-3 mb-3">
+			<div class="card shadow-sm border-danger">
+				<div class="card-body">
+					<h5 class="card-title text-danger">Monto Total Invertido</h5>
+					<h3>$@Model.MontoTotalInvertido.ToString("N2")</h3>
+				</div>
+			</div>
+		</div>
+	</div>
 
-<!-- === Gráficas === -->
-<div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">🏆 Mejores Proveedores</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="chartMejoresProveedores"></canvas>
-            </div>
-        </div>
-    </div>
+	<!-- === Gráficas === -->
+	<div class="row">
+		<div class="col-md-6 mb-4">
+			<div class="card shadow">
+				<div class="card-header bg-primary text-white">
+					<h5 class="mb-0">🏆 Mejores Proveedores</h5>
+				</div>
+				<div class="card-body">
+					<canvas id="chartMejoresProveedores"></canvas>
+				</div>
+			</div>
+		</div>
 
-    <div class="col-md-6 mb-4">
-        <div class="card shadow">
-            <div class="card-header bg-success text-white">
-                <h5 class="mb-0">💰 Proveedores con mayores ingresos</h5>
-            </div>
-            <div class="card-body">
-                <canvas id="chartProveedoresIngresos"></canvas>
-            </div>
-        </div>
-    </div>
-</div>
+		<div class="col-md-6 mb-4">
+			<div class="card shadow">
+				<div class="card-header bg-success text-white">
+					<h5 class="mb-0">💰 Proveedores con mayores ingresos</h5>
+				</div>
+				<div class="card-body">
+					<canvas id="chartProveedoresIngresos"></canvas>
+				</div>
+			</div>
+		</div>
+	</div>
+}
 
 <!-- === Actividad reciente === -->
 <h3 class="mt-5 mb-3">🕒 Actividad Reciente</h3>
 
 <div class="row">
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-sm">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0">Últimas Adquisiciones</h5>
-            </div>
-            <div class="card-body p-0">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>N° Serie</th>
-                            <th>Equipo</th>
-                            <th>Técnico</th>
-                            <th>Proveedor</th>
-                            <th>Fecha</th>
-                            <th>Costo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var a in Model.UltimasAdquisiciones)
-                        {
-                            <tr>
-                                <td>@a.NumeroSerie</td>
-                                <td>@a.Equipo</td>
-                                <td>@a.Tecnico</td>
-                                <td>@a.Proveedor</td>
-                                <td>@a.FechaAdquisicion.ToString("dd/MM/yyyy")</td>
-                                <td>$@a.Costo.ToString("N2")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+	<div class="col-md-6 mb-4">
+		<div class="card shadow-sm">
+			<div class="card-header bg-info text-white">
+				<h5 class="mb-0">Últimas Adquisiciones</h5>
+			</div>
+			<div class="card-body p-0">
+				<table class="table table-striped table-hover mb-0">
+					<thead class="table-light">
+						<tr>
+							<th>N° Serie</th>
+							<th>Equipo</th>
+							<th>Técnico</th>
+							<th>Proveedor</th>
+							<th>Fecha</th>
+							<th>Costo</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var a in Model.UltimasAdquisiciones)
+						{
+							<tr>
+								<td>@a.NumeroSerie</td>
+								<td>@a.Equipo</td>
+								<td>@a.Tecnico</td>
+								<td>@a.Proveedor</td>
+								<td>@a.FechaAdquisicion.ToString("dd/MM/yyyy")</td>
+								<td>$@a.Costo.ToString("N2")</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 
-    <div class="col-md-6 mb-4">
-        <div class="card shadow-sm">
-            <div class="card-header bg-secondary text-white">
-                <h5 class="mb-0">Últimos Mantenimientos</h5>
-            </div>
-            <div class="card-body p-0">
-                <table class="table table-striped table-hover mb-0">
-                    <thead class="table-light">
-                        <tr>
-                            <th>N° Serie</th>
-                            <th>Técnico</th>
-                            <th>Tipo</th>
-                            <th>Fecha</th>
-                            <th>Estado</th>
-                            <th>Costo</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var m in Model.UltimosMantenimientos)
-                        {
-                            <tr>
-                                <td>@m.NumeroSerie</td>
-                                <td>@m.Tecnico</td>
-                                <td>@m.TipoMantenimiento</td>
-                                <td>@m.Fecha.ToString("dd/MM/yyyy")</td>
-                                <td>@m.Estado</td>
-                                <td>$@m.Costo.ToString("N2")</td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
+	<div class="col-md-6 mb-4">
+		<div class="card shadow-sm">
+			<div class="card-header bg-secondary text-white">
+				<h5 class="mb-0">Últimos Mantenimientos</h5>
+			</div>
+			<div class="card-body p-0">
+				<table class="table table-striped table-hover mb-0">
+					<thead class="table-light">
+						<tr>
+							<th>N° Serie</th>
+							<th>Técnico</th>
+							<th>Tipo</th>
+							<th>Fecha</th>
+							<th>Estado</th>
+							<th>Costo</th>
+						</tr>
+					</thead>
+					<tbody>
+						@foreach (var m in Model.UltimosMantenimientos)
+						{
+							<tr>
+								<td>@m.NumeroSerie</td>
+								<td>@m.Tecnico</td>
+								<td>@m.TipoMantenimiento</td>
+								<td>@m.Fecha.ToString("dd/MM/yyyy")</td>
+								<td>@m.Estado</td>
+								<td>$@m.Costo.ToString("N2")</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	</div>
 </div>
 
 @section Scripts {
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Mejores Proveedores
-        new Chart(document.getElementById('chartMejoresProveedores'), {
-            type: 'bar',
-            data: {
-                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MejoresProveedores.Select(p => p.RazonSocial))),
-                datasets: [{
-                    label: 'Calificación',
-                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MejoresProveedores.Select(p => p.Calificacion))),
-                    backgroundColor: 'rgba(54, 162, 235, 0.6)'
-                }]
-            },
-            options: { scales: { y: { beginAtZero: true, max: 5 } } }
-        });
+	<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+	<script>
+		// Mejores Proveedores
+		new Chart(document.getElementById('chartMejoresProveedores'), {
+			type: 'bar',
+			data: {
+				labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MejoresProveedores.Select(p => p.RazonSocial))),
+				datasets: [{
+					label: 'Calificación',
+					data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MejoresProveedores.Select(p => p.Calificacion))),
+					backgroundColor: 'rgba(54, 162, 235, 0.6)'
+				}]
+			},
+			options: { scales: { y: { beginAtZero: true, max: 5 } } }
+		});
 
-        // Proveedores con mayores ingresos
-        new Chart(document.getElementById('chartProveedoresIngresos'), {
-            type: 'bar',
-            data: {
-                labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProveedoresConMasIngresos.Select(p => p.RazonSocial))),
-                datasets: [{
-                    label: 'Total Pagado ($)',
-                    data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProveedoresConMasIngresos.Select(p => p.TotalPagado))),
-                    backgroundColor: 'rgba(75, 192, 192, 0.6)'
-                }]
-            },
-            options: { scales: { y: { beginAtZero: true } } }
-        });
-    </script>
+		// Proveedores con mayores ingresos
+		new Chart(document.getElementById('chartProveedoresIngresos'), {
+			type: 'bar',
+			data: {
+				labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProveedoresConMasIngresos.Select(p => p.RazonSocial))),
+				datasets: [{
+					label: 'Total Pagado ($)',
+					data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.ProveedoresConMasIngresos.Select(p => p.TotalPagado))),
+					backgroundColor: 'rgba(75, 192, 192, 0.6)'
+				}]
+			},
+			options: { scales: { y: { beginAtZero: true } } }
+		});
+	</script>
 }

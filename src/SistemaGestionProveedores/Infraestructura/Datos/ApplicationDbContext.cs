@@ -16,6 +16,7 @@ public class ApplicationDbContext : DbContext
     public DbSet<Adquisicion> Adquisiciones { get; set; }
     public DbSet<TipoMantenimiento> TiposMantenimiento { get; set; }
     public DbSet<Mantenimiento> Mantenimientos { get; set; }
+    public DbSet<Usuario> Usuarios { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -28,6 +29,7 @@ public class ApplicationDbContext : DbContext
         AdquisicionesConfig(modelBuilder);
         TiposMantenimientoConfig(modelBuilder);
         MantenimientosConfig(modelBuilder);
+        UsuariosConfig(modelBuilder);
     }
 
     private void ProveedoresConfig(ModelBuilder modelBuilder)
@@ -153,6 +155,18 @@ public class ApplicationDbContext : DbContext
                   .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasData(Iniciales.Instance.Mantenimientos);
+        });
+    }
+
+    private void UsuariosConfig(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Usuario>(entity =>
+        {
+            entity.ToTable("usuarios");
+            entity.HasKey(u => u.Id);
+            entity.Property(u => u.NombreUsuario).IsRequired();
+            entity.Property(u => u.Contrasena).IsRequired();
+            entity.Property(u => u.Rol).IsRequired();
         });
     }
 }
