@@ -1,0 +1,35 @@
+﻿@using Presentacion.Models.Proveedores
+@model ProveedorViewModel
+
+@{
+    ViewData["Title"] = "Detalles del Proveedor";
+}
+
+<h2 class="mb-4">Detalles del Proveedor</h2>
+
+<div class="card shadow-sm p-3">
+    <dl class="row">
+        <dt class="col-sm-3">Razón Social</dt>
+        <dd class="col-sm-9">@Model.RazonSocial</dd>
+
+        <dt class="col-sm-3">CUIT</dt>
+        <dd class="col-sm-9">@Model.CUIT</dd>
+
+        <dt class="col-sm-3">Email</dt>
+        <dd class="col-sm-9">@Model.Email</dd>
+
+        <dt class="col-sm-3">Dirección</dt>
+        <dd class="col-sm-9">@Model.Direccion</dd>
+
+        <dt class="col-sm-3">Teléfono</dt>
+        <dd class="col-sm-9">@Model.Telefono</dd>
+
+        <dt class="col-sm-3">Calificación</dt>
+        <dd class="col-sm-9">@Model.Calificacion</dd>
+    </dl>
+</div>
+
+<div class="mt-4">
+    <a asp-action="Editar" asp-route-id="@Model.Id" class="btn btn-primary">Editar</a>
+    <a asp-action="Index" class="btn btn-secondary">Volver a la lista</a>
+</div>

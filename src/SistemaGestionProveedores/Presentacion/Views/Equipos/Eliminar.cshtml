@@ -1,0 +1,28 @@
+﻿@using Presentacion.Models.Equipos
+@model EquipoViewModel
+
+@{
+    ViewData["Title"] = "Eliminar Equipo";
+}
+
+<h2 class="mb-4 text-danger">Eliminar Equipo</h2>
+
+<h4>¿Está seguro de que desea eliminar este equipo?</h4>
+<hr />
+
+<dl class="row">
+    <dt class="col-sm-3">Nombre</dt>
+    <dd class="col-sm-9">@Model.Nombre</dd>
+
+    <dt class="col-sm-3">Tipo de Equipo</dt>
+    <dd class="col-sm-9">@Model.TipoEquipoNombre</dd>
+
+    <dt class="col-sm-3">Proveedor</dt>
+    <dd class="col-sm-9">@Model.ProveedorNombre</dd>
+</dl>
+
+<form asp-action="Eliminar" method="post">
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Eliminar</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancelar</a>
+</form>

@@ -1,0 +1,16 @@
+﻿namespace Dominio.Entidades;
+
+public class Proveedor : EntidadBase
+{
+    public string RazonSocial { get; set; }
+    public string CUIT { get; set; }
+    public string? Email { get; set; }
+    public string? Direccion { get; set; }
+    public string? Telefono { get; set; }
+    public float Calificacion { get; set; }
+
+    public int Activado { get; set; } = 1;
+
+    public ICollection<Equipo> Equipos { get; set; } = new List<Equipo>();
+    public ICollection<Tecnico> Tecnicos { get; set; } = new List<Tecnico>();
+}

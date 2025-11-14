@@ -1,0 +1,153 @@
+﻿@using Presentacion.Models.Mantenimientos
+@model MantenimientoUpsertViewModel
+
+@{
+    ViewData["Title"] = "Editar Mantenimiento";
+}
+
+<h2 class="mb-4 text-center">Editar Mantenimiento</h2>
+
+<form asp-action="Editar" method="post" class="card shadow-lg border-0 p-4">
+    <input type="hidden" asp-for="Id" />
+
+    <div class="row g-3">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="col-md-4">
+            <label for="dniTecnico" class="form-label">DNI del Técnico</label>
+            <input type="text" id="dniTecnico" name="dniTecnico" class="form-control" value="@Model.DniTecnico" placeholder="Ingrese DNI del técnico" required />
+            <span asp-validation-for="DniTecnico" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label for="nombreTecnico" class="form-label">Técnico</label>
+            <input asp-for="NombreCompletoTecnico" type="text" id="nombreTecnico" class="form-control" readonly value="@Model.NombreCompletoTecnico" placeholder="Nombre y Apellido del Técnico" />
+        </div>
+
+        <div class="col-md-4 d-flex align-items-end">
+            <button type="button" id="btnBuscarTecnico" class="btn btn-outline-primary w-100">
+                <i class="bi bi-search"></i> Buscar Técnico
+            </button>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Número de Serie</label>
+            <input asp-for="NumeroSerie" class="form-control" value="@Model.NumeroSerie" readonly />
+            <span asp-validation-for="NumeroSerie" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Equipo</label>
+            <input asp-for="Equipo" class="form-control" value="@Model.Equipo" readonly />
+            <span asp-validation-for="Equipo" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label class="form-label">Tipo de Equipo</label>
+            <input asp-for="TipoEquipo" class="form-control" value="@Model.TipoEquipo" readonly />
+            <span asp-validation-for="TipoEquipo" class="text-danger"></span>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="TipoMantenimientoId" class="form-label">Tipo de Mantenimiento</label>
+            <select asp-for="TipoMantenimientoId" class="form-select" asp-items="Model.TiposMantenimientoDisponibles"></select>
+            
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Estado" class="form-label">Estado</label>
+            <select asp-for="Estado" class="form-select" asp-items="Model.EstadosDisponibles"></select>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Fecha" class="form-label">Fecha</label>
+            <input asp-for="Fecha" type="date" class="form-control" />
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Costo" class="form-label">Costo</label>
+            <input asp-for="Costo" class="form-control" type="number" step="0.01" />
+        </div>
+
+        <div class="col-md-12">
+            <label asp-for="Descripcion" class="form-label">Descripción</label>
+            <textarea asp-for="Descripcion" class="form-control" rows="3"></textarea>
+        </div>
+
+        <div class="col-md-4">
+            <label asp-for="Calificacion" class="form-label">Calificación (0-5)</label>
+            <input asp-for="Calificacion" class="form-control" type="number" step="0.1" min="0" max="5" />
+        </div>
+
+        <input asp-for="AdquisicionId" hidden />
+        <input asp-for="TecnicoId" hidden />
+    </div>
+
+    <div class="mt-4 d-flex justify-content-between">
+        <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Guardar Cambios
+        </button>
+        <a asp-action="Index" class="btn btn-secondary">
+            <i class="bi bi-arrow-left-circle"></i> Volver
+        </a>
+    </div>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
+    <script>
+        // --- Buscar técnico por DNI (simulación o llamada real AJAX) ---
+        document.getElementById('btnBuscarTecnico').addEventListener('click', async function () {
+            const dni = document.getElementById('dniTecnico').value.trim();
+
+            if (!dni) {
+                alert("Por favor ingrese un DNI.");
+                return;
+            }
+
+            try {
+                // Llamada a endpoint del backend que busca el técnico por DNI
+                const response = await fetch(`/Tecnicos/BuscarTecnicoPorDni?dni=${dni}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    document.getElementById('nombreTecnico').value = `${data.tecnico.nombre} ${data.tecnico.apellido}`;
+                    document.getElementById('TecnicoId').value = data.tecnico.id;
+                } else {
+                    document.getElementById('nombreTecnico').value = "";
+                    alert("No se encontró ningún técnico con ese DNI.");
+                }
+            } catch {
+                alert("Error al buscar el técnico. Intente nuevamente.");
+            }
+        });
+
+        // --- Escenario 6c: Reparación en garantía => costo 0 ---
+        document.getElementById('tipoMantenimiento').addEventListener('change', function () {
+            const texto = this.options[this.selectedIndex].text.toLowerCase();
+            const costoInput = document.getElementById('costo');
+
+            if (texto.includes('garantía')) {
+                costoInput.value = 0;
+                costoInput.readOnly = true;
+            } else {
+                costoInput.readOnly = false;
+            }
+        });
+
+        // --- Escenario 6d: Estado FINALIZADO => mostrar calificación ---
+        document.getElementById('estado').addEventListener('change', function () {
+            const calificacionContainer = document.getElementById('calificacionContainer');
+            const texto = this.options[this.selectedIndex].text.toUpperCase();
+
+            if (texto === 'FINALIZADO') {
+                calificacionContainer.style.display = 'block';
+            } else {
+                calificacionContainer.style.display = 'none';
+                document.querySelector('[name="Calificacion"]').value = '';
+            }
+        });
+    </script>
+}
