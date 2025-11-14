@@ -24,7 +24,7 @@ public class ProveedoresController : Controller
     {
         ViewData["SortOrder"] = sortOrder ?? "";
 
-        var proveedores = await _proveedorServ.ObtenerTodos();
+        var proveedores = await _proveedorServ.ObtenerTodos(p => p.Activado == 1);
 
         var proveedoresVM = proveedores.Select(p => new ProveedorViewModel
         {
@@ -189,7 +189,8 @@ public class ProveedoresController : Controller
     [HttpPost]
     public async Task<IActionResult> Eliminar(ProveedorViewModel modelo)
     {
-        var proveedor = new Proveedor { Id = modelo.Id };
+        var proveedor = await _proveedorServ.Obtener(modelo.Id);
+        proveedor!.Activado = 0;
 
         try
         {
