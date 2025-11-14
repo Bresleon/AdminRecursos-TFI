@@ -9,6 +9,8 @@ public class Proveedor : EntidadBase
     public string? Telefono { get; set; }
     public float Calificacion { get; set; }
 
+    public int Activado { get; set; } = 1;
+
     public ICollection<Equipo> Equipos { get; set; } = new List<Equipo>();
     public ICollection<Tecnico> Tecnicos { get; set; } = new List<Tecnico>();
 }

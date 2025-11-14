@@ -10,5 +10,7 @@ public class Equipo : EntidadBase
 
     public string Nombre { get; set; }
 
+    public int Activado { get; set; } = 1;
+
     public ICollection<Adquisicion> Adquisiciones { get; set; } = new List<Adquisicion>();
 }

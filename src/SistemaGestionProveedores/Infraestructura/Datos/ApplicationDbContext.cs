@@ -44,6 +44,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(p => p.Direccion).HasMaxLength(100);
             entity.Property(p => p.Telefono).HasMaxLength(15);
             entity.Property(p => p.Calificacion).HasColumnType("float").HasDefaultValue(0);
+            entity.Property(p => p.Activado).HasDefaultValue(1);
 
             entity.HasData(Iniciales.Instance.Proveedores);
         });
@@ -62,6 +63,7 @@ public class ApplicationDbContext : DbContext
             entity.HasOne(e => e.Proveedor)
                   .WithMany(p => p.Equipos)
                   .HasForeignKey(e => e.ProveedorId);
+            entity.Property(e => e.Activado).HasDefaultValue(1);
 
             entity.HasData(Iniciales.Instance.Equipos);
         });
@@ -90,6 +92,7 @@ public class ApplicationDbContext : DbContext
             entity.Property(t => t.DNI).IsRequired().HasMaxLength(8).IsFixedLength();
             entity.Property(t => t.Telefono).IsRequired().HasMaxLength(15).IsFixedLength();
             entity.Property(t => t.Calificacion).HasColumnType("float").HasDefaultValue(0);
+            entity.Property(p => p.Activado).HasDefaultValue(1);
 
             entity.HasData(Iniciales.Instance.Tecnicos);
         });
