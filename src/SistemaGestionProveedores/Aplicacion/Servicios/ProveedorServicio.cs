@@ -24,7 +24,8 @@ public class ProveedorServicio : IProveedorServicio
 
     public async Task Eliminar(Proveedor proveedor)
     {
-        var esExitosa = await _repo.Eliminar(proveedor);
+        proveedor.Activado = 0;
+        var esExitosa = await _repo.Modificar(proveedor);
 
         if (!esExitosa)
             throw new Exception("No se pudo eliminar el proveedor");
@@ -40,7 +41,7 @@ public class ProveedorServicio : IProveedorServicio
 
     public async Task<Proveedor?> Obtener(Guid id)
     {
-        var proveedor = await _repo.ObtenerPorId(id);
+        var proveedor = await _repo.ObtenerPorId(id, p => p.Tecnicos);
 
         if (proveedor == null)
             throw new Exception("No se pudo encontrar el proveedor");

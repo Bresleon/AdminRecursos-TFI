@@ -19,7 +19,7 @@ public class AdquisicionesController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var adquisiciones = await _servicio.ObtenerTodos();
+        var adquisiciones = await _servicio.ObtenerTodos(a => a.Tecnico.Proveedor.Activado == 1);
 
         var adquisicionesVM = adquisiciones.Select(a => new AdquisicionViewModel
         {
@@ -152,7 +152,7 @@ public class AdquisicionesController : Controller
     {
         var adquisicion = await _servicio.Obtener(numeroSerie);
 
-        if (adquisicion == null)
+        if (adquisicion == null || adquisicion.Tecnico.Proveedor.Activado == 0)
         {
             ViewBag.Mensaje = "No se encontró ningún equipo con el número de serie proporcionado.";
             return View();

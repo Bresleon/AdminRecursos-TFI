@@ -24,7 +24,8 @@ public class TecnicoServicio : ITecnicoServicio
 
     public async Task Eliminar(Tecnico tecnico)
     {
-        var esExitosa = await _repo.Eliminar(tecnico);
+        tecnico.Activado = 0;
+        var esExitosa = await _repo.Modificar(tecnico);
 
         if (!esExitosa)
             throw new Exception("No se pudo eliminar el tecnico");
@@ -50,7 +51,7 @@ public class TecnicoServicio : ITecnicoServicio
 
     public async Task<Tecnico?> Obtener(string dni)
     {
-        var tecnico = await _repo.Obtener(t => t.DNI == dni, t => t.Proveedor, t => t.Proveedor.Equipos);
+        var tecnico = await _repo.Obtener(t => t.DNI == dni, t => t.Proveedor, t => t.Proveedor.Equipos, t => t.Mantenimientos);
 
         if (tecnico == null)
             throw new Exception("No se pudo encontrar el tecnico");

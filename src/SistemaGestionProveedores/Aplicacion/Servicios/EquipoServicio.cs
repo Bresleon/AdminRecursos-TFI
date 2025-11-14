@@ -24,7 +24,8 @@ public class EquipoServicio : IEquipoServicio
 
     public async Task Eliminar(Equipo equipo)
     {
-        var esExitosa = await _repo.Eliminar(equipo);
+        equipo.Activado = 0;
+        var esExitosa = await _repo.Modificar(equipo);
 
         if (!esExitosa)
             throw new Exception("No se pudo eliminar el equipo");

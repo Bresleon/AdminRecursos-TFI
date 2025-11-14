@@ -23,7 +23,7 @@ public class EquiposController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var equipos = await _equipoServ.ObtenerTodos();
+        var equipos = await _equipoServ.ObtenerTodos(e => e.Activado == 1);
 
         var equiposVM = equipos.Select(e => new EquipoViewModel
         {
@@ -40,7 +40,7 @@ public class EquiposController : Controller
 
     public async Task<IActionResult> Crear()
     {
-        var proveedores = await _proveedorServ.ObtenerTodos();
+        var proveedores = await _proveedorServ.ObtenerTodos(p => p.Activado == 1);
         var tiposEquipo = await _tipoEquipoServ.ObtenerTodos();
 
         var equipoVM = new EquipoViewModel
@@ -99,7 +99,7 @@ public class EquiposController : Controller
             return NotFound();
         }
 
-        var proveedores = await _proveedorServ.ObtenerTodos();
+        var proveedores = await _proveedorServ.ObtenerTodos(p => p.Activado == 1);
         var tiposEquipo = await _tipoEquipoServ.ObtenerTodos();
 
         var equipoVM = new EquipoViewModel
@@ -178,7 +178,8 @@ public class EquiposController : Controller
     [HttpPost]
     public async Task<IActionResult> Eliminar(EquipoViewModel modelo)
     {
-        var equipo = new Equipo { Id = modelo.Id };
+        var equipo = await _equipoServ.Obtener(modelo.Id);
+        equipo!.Activado = 0;
 
         try
         {

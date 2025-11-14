@@ -23,8 +23,8 @@ public class TecnicosController : Controller
     public async Task<IActionResult> Index(string? dni = null)
     {
         var tecnicos = !string.IsNullOrEmpty(dni) 
-            ? await _tecnicoServ.ObtenerTodos(t => t.DNI == dni)
-            : await _tecnicoServ.ObtenerTodos();
+            ? await _tecnicoServ.ObtenerTodos(t => t.DNI == dni && t.Activado == 1)
+            : await _tecnicoServ.ObtenerTodos(t => t.Activado == 1);
 
         ViewData["DNI"] = dni;
 
@@ -44,7 +44,7 @@ public class TecnicosController : Controller
 
     public async Task<IActionResult> Crear()
     {
-        var proveedores = await _proveedorServ.ObtenerTodos();
+        var proveedores = await _proveedorServ.ObtenerTodos(p => p.Activado == 1);
 
         var proveedoresSelect = proveedores.Select(p => new SelectListItem
         {
@@ -119,7 +119,7 @@ public class TecnicosController : Controller
         if (tecnico == null)
             return NotFound();
 
-        var proveedores = await _proveedorServ.ObtenerTodos();
+        var proveedores = await _proveedorServ.ObtenerTodos(p => p.Activado == 1);
 
         var proveedoresSelect = proveedores.Select(p => new SelectListItem
         {
@@ -199,7 +199,8 @@ public class TecnicosController : Controller
     [HttpPost]
     public async Task<IActionResult> Eliminar(TecnicoViewModel modelo)
     {
-        var tecnico = new Tecnico { Id = modelo.Id };
+        var tecnico = await _tecnicoServ.Obtener(modelo.Id);
+        tecnico!.Activado = 0;
 
         try
         {
@@ -220,7 +221,7 @@ public class TecnicosController : Controller
     {
         var tecnico = await _tecnicoServ.Obtener(dni);
 
-        if (tecnico == null)
+        if (tecnico == null || tecnico.Activado == 0 || tecnico.Proveedor.Activado == 0)
             return Json(null);
 
         var equipos = tecnico.Proveedor.Equipos

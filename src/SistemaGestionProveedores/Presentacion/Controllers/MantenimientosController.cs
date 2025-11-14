@@ -27,9 +27,11 @@ public class MantenimientosController : Controller
         _tipoMantenimientoServ = tipoMantenimientoServ;
     }
 
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? numeroSerie = null)
     {
-        var mantenimientos = await _mantenimientoServ.ObtenerTodos();
+        var mantenimientos = !string.IsNullOrEmpty(numeroSerie)
+            ? await _mantenimientoServ.ObtenerTodos(m => m.Adquisicion.NumeroSerie == numeroSerie && m.Tecnico.Proveedor.Activado == 1)
+            : await _mantenimientoServ.ObtenerTodos(m => m.Tecnico.Proveedor.Activado == 1);
 
         var mantenimientosVM = mantenimientos.Select(m => new MantenimientoViewModel
         {

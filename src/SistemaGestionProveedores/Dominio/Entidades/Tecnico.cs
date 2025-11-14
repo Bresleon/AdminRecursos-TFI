@@ -11,6 +11,8 @@ public class Tecnico : EntidadBase
     public string Telefono { get; set; }
     public float Calificacion { get; set; }
 
+    public int Activado { get; set; } = 1;
+
     public ICollection<Adquisicion> Adquisiciones { get; set; } = new List<Adquisicion>();
     public ICollection<Mantenimiento> Mantenimientos { get; set; } = new List<Mantenimiento>();
 }

@@ -21,9 +21,9 @@ public class HomeController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var proveedores = await _proveedorServ.ObtenerTodos();
-        var adquisiciones = await _adquisicionServ.ObtenerTodos();
-        var mantenimientos = await _mantenimientoServ.ObtenerTodos();
+        var proveedores = await _proveedorServ.ObtenerTodos(p => p.Activado == 1);
+        var adquisiciones = await _adquisicionServ.ObtenerTodos(a => a.Tecnico.Activado == 1);
+        var mantenimientos = await _mantenimientoServ.ObtenerTodos(m => m.Tecnico.Activado == 1);
 
         var mejoresProveedores = proveedores
             .OrderByDescending(p => p.Calificacion)
